@@ -9,7 +9,7 @@ public class DataPrepareManager {
     DiskReadThread diskRead;
     DistributeBufferThread distributeBuffer;
     RawBufferSolveThread[] rawBufferSolveThreadArray=new RawBufferSolveThread[16];
-    static int THREAD_NUMBER=1;
+    static int THREAD_NUMBER=6;
     DataPrepareManager() {
         diskRead = new DiskReadThread();
         distributeBuffer = new DistributeBufferThread();

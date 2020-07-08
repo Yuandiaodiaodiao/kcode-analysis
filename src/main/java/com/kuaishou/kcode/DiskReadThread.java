@@ -49,6 +49,12 @@ public class DiskReadThread extends Thread {
     private void saveLastLine(ByteBuffer lastLine,ByteBuffer buffer){
         int lastIndex=buffer.limit();
         //找到最后一个\n的位置
+        if(buffer.get(lastIndex-1)=='\n'){
+            lastLine.clear();
+            lastLine.limit(0);
+            return;
+        }
+
         while( buffer.get(--lastIndex)!='\n'){
 
         }
@@ -65,6 +71,10 @@ public class DiskReadThread extends Thread {
      * @param buffer 这一次要读入的buffer
      */
     private void loadLastLine(ByteBuffer lastLine,ByteBuffer buffer){
+        if(lastLine.limit()==0){
+            lastLine.clear();
+            return;
+        }
         buffer.put(lastLine);
         lastLine.clear();
     }
@@ -74,7 +84,7 @@ public class DiskReadThread extends Thread {
         super.run();
         try {
 
-            ByteBuffer lastLine=ByteBuffer.allocate(200);
+            ByteBuffer lastLine=ByteBuffer.allocate(256);
             lastLine.clear();
             lastLine.flip();
             for (long i = 0; i < fileLength; i += CHUNCK_SIZE) {

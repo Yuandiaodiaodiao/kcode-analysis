@@ -26,7 +26,7 @@ public class DistributeBufferThread extends Thread{
         this.unsolvedBuffer=unsolvedBuffer;
         this.solvedBuffer=solvedBuffer;
     }
-
+    static int baseMinuteTime=-1;
     @Override
     public void run() {
         super.run();
@@ -50,6 +50,12 @@ public class DistributeBufferThread extends Thread{
                 bufOutput.flip();
                 //拷贝完成 归还directBuffer
                 canuse.offer(buf);
+                //首次处理的时候要读入一次time 得到基准时间戳
+                if(baseMinuteTime==-1){
+                    //因为时间戳+-1浮动 所以取最早可能时间作为基准
+                    baseMinuteTime=Utils.getFirstTime(bufOutput)-3;
+                    System.out.println("基准time="+baseMinuteTime);
+                }
                 //将含有数据的buffer扔给任务队列
                 unsolvedBuffer.offer(bufOutput);
             }

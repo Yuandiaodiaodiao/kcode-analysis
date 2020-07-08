@@ -13,8 +13,44 @@ public class Utils {
         }
         byteBufferArrayField.setAccessible(true);
     }
+    static Field stringByteArrayField;
+
     public static byte[] getHeapByteBufferArray(ByteBuffer b) throws IllegalAccessException {
             return (byte[]) byteBufferArrayField.get(b);
+    }
+
+    static int getFirstTime(ByteBuffer buffer) {
+        byte[] byteArray = null;
+        try {
+            byteArray = Utils.getHeapByteBufferArray(buffer);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        int position = buffer.position()-1;
+        //逗号,分隔
+        while ((byteArray[++position]) != 44) {
+        }
+        while ((byteArray[++position]) != 44) {
+        }
+        while ((byteArray[++position]) != 44) {
+        }
+        while ((byteArray[++position]) != 44) {
+        }
+        int success = (byteArray[++position] == 116 ? 0 : 1);
+        position += 4 + success;
+        while ((byteArray[++position]) != 44) {
+        }
+
+
+        ++position;
+        int timeEndPos = position + 9;
+        int secondTime = 0;
+        for (int timepos = position; timepos <= timeEndPos; ++timepos) {
+            secondTime = (byteArray[timepos] - 48) + secondTime * 10;
+        }
+        //毫秒时间戳 去掉后3位数字 是秒级时间戳 /60后是分钟时间戳
+        int minTime = secondTime / 60;
+        return minTime;
     }
 
 }
