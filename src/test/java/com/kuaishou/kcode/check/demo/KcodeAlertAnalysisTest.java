@@ -24,23 +24,23 @@ public class KcodeAlertAnalysisTest {
     public static void main(String[] args) throws Exception {
         // 第一套数据集
         //kcodeAlertForStudent-1.data，原始监控数据
-        String sourceFilePath1 = "";
+        String sourceFilePath1 = "D:\\Github\\kcodedata\\data1\\kcodeAlertForStudent-1.data";
         // ruleForStudent-1，报警规则
-        String ruleFilePath1 = "";
+        String ruleFilePath1 = "D:\\Github\\kcodedata\\data1\\ruleForStudent-1.txt";
         // Q1Result-1.txt，第一问结果
-        String q1ResultFilePath1 = "";
+        String q1ResultFilePath1 = "D:\\Github\\kcodedata\\data1\\Q1Result-1.txt";
         // Q2Result-1.txt，第二问输出和结果
-        String q2ResultFilePath1 = "";
+        String q2ResultFilePath1 = "D:\\Github\\kcodedata\\data1\\Q2Result-1.txt";
 
         // 第二套数据集
         //kcodeAlertForStudent-2.data，原始监控数据
-        String sourceFilePath2 = "";
+        String sourceFilePath2 = "D:\\Github\\kcodedata\\data2\\kcodeAlertForStudent-2.data";
         // ruleForStudent-2，报警规则
-        String ruleFilePath2 = "";
+        String ruleFilePath2 = "D:\\Github\\kcodedata\\data2\\ruleForStudent-2.txt";
         // Q1Result-2.txt，第一问结果
-        String q1ResultFilePath2 = "";
+        String q1ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q1Result-2.txt";
         // Q2Result-2.txt，第二问输出和结果
-        String q2ResultFilePath2 = "";
+        String q2ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q2Result-2.txt";
 
         testQuestion12(sourceFilePath1, ruleFilePath1, q1ResultFilePath1, q2ResultFilePath1);
         testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
