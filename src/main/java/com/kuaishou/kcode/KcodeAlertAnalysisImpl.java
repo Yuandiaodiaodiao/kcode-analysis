@@ -21,7 +21,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         String s=AnalyzeData.printMemoryInfo();
         if(DistributeBufferThread.baseMinuteTime>0){
 
-            throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime());
+            throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime()+"Dwb="+DiskReadThread.DiskRead_waitBuffer);
         }
         return null;
     }

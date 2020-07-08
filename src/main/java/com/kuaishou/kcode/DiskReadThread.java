@@ -92,7 +92,10 @@ public class DiskReadThread extends Thread {
                 if(canuse.size()==0 && lastBufferNumbers-->0){
                     buf=ByteBuffer.allocateDirect(CHUNCK_SIZE);
                 }else{
+                    TimeRange t1=new TimeRange();
                     buf=canuse.take();
+                    t1.point();
+                    DiskRead_waitBuffer+=t1.firstTime();
                 }
                 buf.clear();
                 loadLastLine(lastLine,buf);

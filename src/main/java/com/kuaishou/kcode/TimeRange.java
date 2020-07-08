@@ -26,6 +26,7 @@ public class TimeRange {
     public int firstTime(){
         return (int)Math.round((timeArray.get(1)-timeArray.get(0))*1.0/1000000);
     }
+
     public void output(String str){
         System.out.print(str);
         output();
