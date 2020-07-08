@@ -1,6 +1,7 @@
 package com.kuaishou.kcode;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.BiFunction;
 
@@ -19,27 +20,17 @@ public class RawBufferSolveThread extends Thread {
     public void run() {
         super.run();
         try {
-
+            HashMap<String,Integer>m=new HashMap<>();
+//            m.put()
             while (true) {
                 ByteBuffer buffer = unsolvedBuffer.take();
-                //14秒
-//                    while(buffer.hasRemaining()){
-//                        buffer.get();
-////                        System.out.print((char)buffer.get());
-//                    }
-                //4秒
 
-//                    int limit=buffer.limit();
-//                    for(int i=0;i<limit;++i){
-//                        buffer.get();
-//                    }
-                //3秒
                 solveLine(buffer);
 
                 if (buffer.get(buffer.limit() - 1) == '\n') {
 //                        System.out.println("正常");
                 } else {
-                    System.out.println("异常");
+                    throw new ArrayIndexOutOfBoundsException("没有正确的切分换行");
                 }
                 solvedBuffer.offer(buffer);
             }
@@ -60,8 +51,8 @@ public class RawBufferSolveThread extends Thread {
 
         int position = buffer.position();
         int limit = buffer.limit()-1;
-        byte[] serviceA = new byte[64];
-        byte[] serviceB = new byte[64];
+        byte[] serviceA = new byte[32];
+        byte[] serviceB = new byte[32];
         while (position < limit) {
             long ip1 = 0;
             long ip2 = 0;
@@ -98,12 +89,19 @@ public class RawBufferSolveThread extends Thread {
             while ((b = byteArray[++position]) != 44) {
                 useTime = (b - 48) + useTime * 10;
             }
+            AnalyzeData.timecostMap.putIfAbsent(useTime,0);
+            AnalyzeData.timecostMap.put(useTime,AnalyzeData.timecostMap.get(useTime)+1);
 
-            int timeEndPos=++position+9;
-            int minTime=0;
+
+            ++position;
+            int timeEndPos=position+9;
+            int secondTime=0;
             for (int timepos = position; timepos <= timeEndPos; ++timepos) {
-                minTime = (byteArray[timepos] - 48) + minTime * 10;
+                secondTime = (byteArray[timepos] - 48) + secondTime * 10;
             }
+            //毫秒时间戳 去掉后3位数字 是秒级时间戳 /60后是分钟时间戳
+            int minTime=secondTime/60;
+            AnalyzeData.timeSet.add(minTime);
             position += 13;
 
 

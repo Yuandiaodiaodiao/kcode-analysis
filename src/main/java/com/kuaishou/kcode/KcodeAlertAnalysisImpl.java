@@ -18,6 +18,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         manager.stop();
         t1.point();
         t1.output("read 耗时");
+        AnalyzeData.printTimeInfo();
+        AnalyzeData.printTimeCostMap();
         return null;
     }
 
