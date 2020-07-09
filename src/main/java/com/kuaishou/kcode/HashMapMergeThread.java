@@ -66,7 +66,7 @@ public class HashMapMergeThread extends Thread{
                 int minute=bl.minute;
 
                 for(int i=solvedMinute;i<minute-3;++i){
-                    System.out.println("正在处理"+i);
+//                    System.out.println("正在处理"+i);
                     mergeHashmap(i);
                     solvedMinute=i+1;
                 }

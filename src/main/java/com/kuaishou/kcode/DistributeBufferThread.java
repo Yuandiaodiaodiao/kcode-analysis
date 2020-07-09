@@ -44,6 +44,7 @@ public class DistributeBufferThread extends Thread{
                 ByteBuffer bufOutput=null;
                 if(solvedBuffer.size()==0 && lastBufferNumbers-->0){
                     //没有可用 并且内存可分配
+//                    System.out.println("分配内存");
                     bufOutput=ByteBuffer.allocate(CHUNCK_SIZE);
                 }else{
                     //从可用队列中取一个
