@@ -3,15 +3,16 @@ package com.kuaishou.kcode;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
 
 public class RawBufferSolveThread extends Thread {
 
 
-    private ArrayBlockingQueue<ByteBuffer> unsolvedBuffer;
+    private ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer;
     private ArrayBlockingQueue<ByteBuffer> solvedBuffer;
 
-    public void LinkHeapBufferBlockingQueue(ArrayBlockingQueue<ByteBuffer> unsolvedBuffer, ArrayBlockingQueue<ByteBuffer> solvedBuffer) {
+    public void LinkHeapBufferBlockingQueue(ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer, ArrayBlockingQueue<ByteBuffer> solvedBuffer) {
         this.unsolvedBuffer = unsolvedBuffer;
         this.solvedBuffer = solvedBuffer;
     }
@@ -24,7 +25,15 @@ public class RawBufferSolveThread extends Thread {
         super.run();
         try {
             while (true) {
-                ByteBuffer buffer = unsolvedBuffer.take();
+                BufferWithLatch bl=unsolvedBuffer.take();
+                if(bl.id==-1){
+                    //结束了
+                    bl.countdown.countDown();
+                    unsolvedBuffer.offer(bl);
+                    break;
+                }
+                ByteBuffer buffer = bl.buffer;
+                CountDownLatch countdown=bl.countdown;
                 if (timeNameIpStore == null) {
                     //初始化线程独有的数据结构 [time][name][ip]
                     timeNameIpStore = new HashMap[64];
@@ -36,7 +45,8 @@ public class RawBufferSolveThread extends Thread {
                     firstTime = DistributeBufferThread.baseMinuteTime;
                 }
                 solveLine(buffer);
-
+                //处理完之后 触发处理ok
+                countdown.countDown();
                 if (buffer.get(buffer.limit() - 1) == '\n') {
 //                        System.out.println("正常");
                 } else {
