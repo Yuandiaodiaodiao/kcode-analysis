@@ -10,7 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 
 public class DiskReadThread extends Thread {
-    long fileLength;
+    static long fileLength;
     FileChannel channel;
     private static final int CHUNCK_SIZE = DataPrepareManager.DIRECT_CHUNK_SIZE;
     private ArrayBlockingQueue<ByteBuffer> canuse;

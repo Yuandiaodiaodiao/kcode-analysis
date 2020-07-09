@@ -5,7 +5,13 @@ import java.nio.ByteBuffer;
 public final class ByteString {
     byte[] value;
     int length;
-
+    public ByteString DeepClone(){
+        ByteString s=new ByteString();
+        s.value=new byte[length];
+        System.arraycopy(value,0,s.value,0,length);
+        s.length=length;
+        return s;
+    }
     ByteString() {
 
     }

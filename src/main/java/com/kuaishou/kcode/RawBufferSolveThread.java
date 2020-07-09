@@ -126,7 +126,7 @@ public class RawBufferSolveThread extends Thread {
             HashMap<Long, SingleIpPayload> ipMap = serviceMap.get(twoServiceName);
             if (ipMap == null) {
                 ipMap = new HashMap<>();
-                serviceMap.put(twoServiceName, ipMap);
+                serviceMap.put(twoServiceName.DeepClone(), ipMap);
                 SingleIpPayload payload = new SingleIpPayload();
                 ipMap.put(twoIPs, payload);
                 payload.success += success ^ 1;
