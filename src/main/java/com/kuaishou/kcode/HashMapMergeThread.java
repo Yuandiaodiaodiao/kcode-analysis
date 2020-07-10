@@ -30,6 +30,7 @@ public class HashMapMergeThread extends Thread{
                             for(int i=0;i<300;++i){
                                 oldValue2.bucket[i]+=newValue2.bucket[i];
                             }
+                            newValue2.bucket=null;
                             return oldValue2;
                         });
                     });
@@ -40,6 +41,35 @@ public class HashMapMergeThread extends Thread{
             t.timeNameIpStore[minute-firstMinute]=null;
 
         }
+    }
+    static int maxBucket=0;
+    int solveP99(byte[] bucket,int allNum){
+        double i=0.99*allNum;
+        int p99= (int) Math.ceil(i);
+        int bucketIndex=bucket.length;
+        while(--bucketIndex>=0){
+//            maxBucket=Math.max(bucket[bucketIndex],maxBucket);
+            allNum-=bucket[bucketIndex];
+            if(allNum<p99){
+                return bucketIndex;
+            }
+        }
+        return 0;
+    }
+    void SolveMinuteP99AndSR(int minute){
+        HashMap<ByteString, HashMap<Long, SingleIpPayload>> thisMinute=timeNameIpStore[minute-firstMinute];
+        if(thisMinute==null)return;
+        thisMinute.forEach((key,value)->{
+            value.forEach((key2,value2)->{
+                SRAndP99Payload payload=new SRAndP99Payload(value2);
+                payload.p99= solveP99(payload.bucket,payload.total);
+                payload.rate=((double) payload.success)/payload.total;
+                //释放bucket内存
+                payload.bucket=null;
+                value.put(key2,payload);
+            });
+        });
+//        System.out.println("最大bucker="+maxBucket);
     }
     @Override
     public void run() {
@@ -67,10 +97,14 @@ public class HashMapMergeThread extends Thread{
 
                 for(int i=solvedMinute;i<minute-3;++i){
 //                    System.out.println("正在处理"+i);
+                    //合并数据
                     mergeHashmap(i);
+                    //进行桶排 处理p99和sr
+                    SolveMinuteP99AndSR(i);
                     solvedMinute=i+1;
                 }
                 if(bl.id==-1){
+                    //退出 表示处理完成
                     break;
                 }
 

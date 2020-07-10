@@ -26,7 +26,8 @@ public final class ByteString {
     public boolean equals(Object obj) {
         ByteString bs=(ByteString)obj;
         if(this.length==bs.length){
-            for(int i=0;i<length;++i){
+            //倒着比较
+            for(int i=length-1;i>=0;--i){
                 if(value[i]!=bs.value[i]){
                     return false;
                 }
