@@ -10,7 +10,7 @@ public class DataPrepareManager {
     DistributeBufferThread distributeBuffer;
     HashMapMergeThread mergeThread;
     static RawBufferSolveThread[] rawBufferSolveThreadArray=new RawBufferSolveThread[16];
-    static int THREAD_NUMBER=4;
+    static int THREAD_NUMBER=1;
     DataPrepareManager() {
         diskRead = new DiskReadThread();
         distributeBuffer = new DistributeBufferThread();
