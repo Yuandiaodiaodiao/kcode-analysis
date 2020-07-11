@@ -13,15 +13,17 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
+
         TimeRange t1=new TimeRange();
         manager.start(path,alertRules);
         manager.stop();
         t1.point();
         t1.output("read 耗时");
+        System.gc();
         String s=AnalyzeData.printMemoryInfo();
-        if(DistributeBufferThread.baseMinuteTime>0){
 
-            throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime()+"Dwb="+DiskReadThread.DiskRead_waitBuffer+"fl="+Math.round(DiskReadThread.fileLength*1.0/1024/1024/1024)+"G");
+        if(DistributeBufferThread.baseMinuteTime>0){
+            throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime()+"R="+alertRules.size() );
         }
         return null;
     }

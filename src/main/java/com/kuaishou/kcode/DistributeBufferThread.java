@@ -3,12 +3,14 @@ package com.kuaishou.kcode;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 
 public class DistributeBufferThread extends Thread{
     private ArrayBlockingQueue<ByteBuffer> canuse;
     private ArrayBlockingQueue<ByteBuffer> canread;
-    private ArrayBlockingQueue<ByteBuffer> unsolvedBuffer;
+    private ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer;
     private ArrayBlockingQueue<ByteBuffer> solvedBuffer;
+    private ArrayBlockingQueue<BufferWithLatch> countDownQueue;
     private static final int CHUNCK_SIZE = DataPrepareManager.DIRECT_CHUNK_SIZE;
     private int readTimes;
     private int lastBufferNumbers;
@@ -22,22 +24,27 @@ public class DistributeBufferThread extends Thread{
         this.canuse=canuse;
         this.canread=canread;
     }
-    public void LinkHeapBufferBlockingQueue(ArrayBlockingQueue<ByteBuffer> unsolvedBuffer,ArrayBlockingQueue<ByteBuffer> solvedBuffer){
+    public void LinkHeapBufferBlockingQueue(ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer,ArrayBlockingQueue<ByteBuffer> solvedBuffer){
         this.unsolvedBuffer=unsolvedBuffer;
         this.solvedBuffer=solvedBuffer;
     }
-    static int baseMinuteTime=-1;
+    public void LinkCountDownBuffer(ArrayBlockingQueue<BufferWithLatch> countDownQueue){
+        this.countDownQueue=countDownQueue;
+    }
+    static volatile int baseMinuteTime=-1;
+    static int lastMinuteTime=-1;
     @Override
     public void run() {
         super.run();
         try {
-
+            int bufferId=0;
             for (long i = 0; i <readTimes; ++i) {
                 ByteBuffer buf =canread.take();
                 //拷贝 并传送buf给子任务
                 ByteBuffer bufOutput=null;
                 if(solvedBuffer.size()==0 && lastBufferNumbers-->0){
                     //没有可用 并且内存可分配
+//                    System.out.println("分配内存");
                     bufOutput=ByteBuffer.allocate(CHUNCK_SIZE);
                 }else{
                     //从可用队列中取一个
@@ -54,11 +61,25 @@ public class DistributeBufferThread extends Thread{
                 if(baseMinuteTime==-1){
                     //因为时间戳+-1浮动 所以取最早可能时间作为基准
                     baseMinuteTime=Utils.getFirstTime(bufOutput)-3;
+                    lastMinuteTime=baseMinuteTime;
                     System.out.println("基准time="+baseMinuteTime);
                 }
+                int thisMinuteTime=Utils.getFirstTime(bufOutput);
+                lastMinuteTime=thisMinuteTime;
+
+
+                CountDownLatch countdown=new CountDownLatch(1);
+                countDownQueue.offer(new BufferWithLatch(countdown,bufferId,thisMinuteTime));
                 //将含有数据的buffer扔给任务队列
-                unsolvedBuffer.offer(bufOutput);
+                unsolvedBuffer.offer(new BufferWithLatch(bufOutput,countdown,bufferId));
+                bufferId++;
             }
+            //要让每个线程都coutdown一下
+            CountDownLatch countdown=new CountDownLatch(DataPrepareManager.THREAD_NUMBER);
+            countDownQueue.offer(new BufferWithLatch(countdown,-1,lastMinuteTime+6));
+            //通过id==-1结束rawbaffer处理线程
+            unsolvedBuffer.offer(new BufferWithLatch(countdown,-1,-1));
+
 
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -3,15 +3,16 @@ package com.kuaishou.kcode;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
 
 public class RawBufferSolveThread extends Thread {
 
 
-    private ArrayBlockingQueue<ByteBuffer> unsolvedBuffer;
+    private ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer;
     private ArrayBlockingQueue<ByteBuffer> solvedBuffer;
 
-    public void LinkHeapBufferBlockingQueue(ArrayBlockingQueue<ByteBuffer> unsolvedBuffer, ArrayBlockingQueue<ByteBuffer> solvedBuffer) {
+    public void LinkHeapBufferBlockingQueue(ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer, ArrayBlockingQueue<ByteBuffer> solvedBuffer) {
         this.unsolvedBuffer = unsolvedBuffer;
         this.solvedBuffer = solvedBuffer;
     }
@@ -24,7 +25,15 @@ public class RawBufferSolveThread extends Thread {
         super.run();
         try {
             while (true) {
-                ByteBuffer buffer = unsolvedBuffer.take();
+                BufferWithLatch bl=unsolvedBuffer.take();
+                if(bl.id==-1){
+                    //结束了
+                    bl.countdown.countDown();
+                    unsolvedBuffer.offer(bl);
+                    break;
+                }
+                ByteBuffer buffer = bl.buffer;
+                CountDownLatch countdown=bl.countdown;
                 if (timeNameIpStore == null) {
                     //初始化线程独有的数据结构 [time][name][ip]
                     timeNameIpStore = new HashMap[64];
@@ -36,7 +45,8 @@ public class RawBufferSolveThread extends Thread {
                     firstTime = DistributeBufferThread.baseMinuteTime;
                 }
                 solveLine(buffer);
-
+                //处理完之后 触发处理ok
+                countdown.countDown();
                 if (buffer.get(buffer.limit() - 1) == '\n') {
 //                        System.out.println("正常");
                 } else {
@@ -118,7 +128,7 @@ public class RawBufferSolveThread extends Thread {
 //            int ipHash = (int) ((((ip1 - 167772160) % 3457) << 9) + ((ip2 - 167772160) % 2833)) % 2551;
             long twoIPs = (ip1 << 32) + ip2;
             HashMap<ByteString, HashMap<Long, SingleIpPayload>> serviceMap = timeNameIpStore[minTime - firstTime];
-            ByteString twoServiceName = new ByteString(serviceAll, serviceBLength + 1);
+            ByteString twoServiceName = new ByteString(serviceAll, serviceBLength + 1,serviceALength);
 //            //5.6s
 //            twoServiceName.hashCode();
 
@@ -126,7 +136,7 @@ public class RawBufferSolveThread extends Thread {
             HashMap<Long, SingleIpPayload> ipMap = serviceMap.get(twoServiceName);
             if (ipMap == null) {
                 ipMap = new HashMap<>();
-                serviceMap.put(twoServiceName.DeepClone(), ipMap);
+                serviceMap.put(twoServiceName.deepClone(), ipMap);
                 SingleIpPayload payload = new SingleIpPayload();
                 ipMap.put(twoIPs, payload);
                 payload.success += success ^ 1;

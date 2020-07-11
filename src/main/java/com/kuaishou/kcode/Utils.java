@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 
 public class Utils {
     static Field byteBufferArrayField;
+    static Field stringField;
     static {
         try {
             byteBufferArrayField = ByteBuffer.allocate(1).getClass().getSuperclass().getDeclaredField("hb");
@@ -13,7 +14,17 @@ public class Utils {
         }
         byteBufferArrayField.setAccessible(true);
     }
-    static Field stringByteArrayField;
+    static {
+        try {
+            stringField = String.class.getDeclaredField("value");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        stringField.setAccessible(true);
+    }
+    public static byte[] getStringByteArray(String s) throws IllegalAccessException {
+        return (byte[])stringField.get(s);
+    }
 
     public static byte[] getHeapByteBufferArray(ByteBuffer b) throws IllegalAccessException {
             return (byte[]) byteBufferArrayField.get(b);
