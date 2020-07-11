@@ -15,6 +15,9 @@ public class AlertRulesPrepare {
         boolean judgeType;
         double thresholdSR;
         int thresholdP99;
+        boolean matchOnce(SRAndP99Payload payload){
+            return (type==1)?(payload.rate>thresholdSR==judgeType):(payload.p99>thresholdP99==judgeType);
+        }
     }
     public static class RuleMaps{
         //主调-被调 作为索引

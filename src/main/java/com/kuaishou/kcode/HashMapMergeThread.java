@@ -1,8 +1,11 @@
 package com.kuaishou.kcode;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Date;
 
 public class HashMapMergeThread extends Thread {
     ArrayBlockingQueue<BufferWithLatch> bufferQueue;
@@ -35,7 +38,8 @@ public class HashMapMergeThread extends Thread {
         RuleIpPayload() {
             this.ipHashMap = new HashMap<>();
         }
-
+        int lastRefreshTime=-1;
+        int checked=0;
         ArrayList<AlertRulesPrepare.Rule> rules;
         HashMap<Long, RuleStatePayload> ipHashMap;
     }
@@ -46,32 +50,87 @@ public class HashMapMergeThread extends Thread {
     int solvedMinute = -1;
     RawBufferSolveThread[] threads;
     HashMap<ByteString, HashMap<Long, SingleIpPayload>>[] timeNameIpStore;
+    ArrayList<String>warningList;
+     static SimpleDateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    static  DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
+    void checkAllIPWarning(ByteString serviceName, RuleIpPayload ruleIpPayload,int minute){
+        StringBuilder stringBuilder=new StringBuilder(200);
+        if(ruleIpPayload.lastRefreshTime==minute&& ruleIpPayload.ipHashMap!=null && ruleIpPayload.ipHashMap.size()>0){
+            //检查
+            ruleIpPayload.ipHashMap.forEach((ip,srp99)->{
+                SRAndP99Payload payload=srp99.payload[minute];
+                if(payload==null)return;
+                final ArrayList<AlertRulesPrepare.Rule> rules = ruleIpPayload.rules;
+                final ArrayList<RuleState> states = srp99.states;
+                if(states ==null){
+                    srp99.states=new ArrayList<>(rules.size());
+                    for(AlertRulesPrepare.Rule r: rules){
+                        srp99.states.add(new RuleState());
+                    }
+                }
+                int len= rules.size();
+                for(int i=0;i<len;++i){
+                    AlertRulesPrepare.Rule r= rules.get(i);
+                    RuleState state=srp99.states.get(i);
+                    if(state.lastCheckTime!=minute-1){
+                        state.warningTimes=0;
+                    }
+                    if(r.matchOnce(payload)){
+
+                        state.warningTimes++;
+                        if(state.warningTimes>r.timeThreshold){
+                            //报警
+                            stringBuilder.setLength(0);
+                            stringBuilder.append(r.id);
+                            stringBuilder.append(',');
+                            stringBuilder.append(dataFormat.format(new Date(((long)firstMinute+minute)*60)));
+                            stringBuilder.append(',');
+                            serviceName.first().appendStringBuilder(stringBuilder);
+                            stringBuilder.append(',');
+                            Utils.firstIp2StringBuilder(ip,stringBuilder);
+                            stringBuilder.append(',');
+                            serviceName.second().appendStringBuilder(stringBuilder);
+                            stringBuilder.append(',');
+                            Utils.secondIp2StringBuilder(ip,stringBuilder);
+                            stringBuilder.append(',');
+                            if(r.type==1){
+                                stringBuilder.append(DFORMAT.format(payload.rate));
+                            }else {
+                                stringBuilder.append(payload.p99);
+                                stringBuilder.append('m');
+                                stringBuilder.append('s');
+                            }
+                            warningList.add(stringBuilder.toString());
+                        }
+                    }else{
+                        state.warningTimes=0;
+                    }
+                    state.lastCheckTime=minute;
+                }
+            });
+
+        }
+    }
     void doWarning(int minute) {
-        HashMap<ByteString, HashMap<Long, SingleIpPayload>> thisMinute = timeNameIpStore[minute - firstMinute];
-        thisMinute.forEach((key, value) -> {
-            RuleIpPayload ruleIpPayload = serviceMapWithRule.get(key);
-            if (ruleIpPayload == null) {
-                //没有规则加入 检查这个是否符合其他规则
-                ArrayList<AlertRulesPrepare.Rule> rules = ruleMaps.checkIfInRule(key);
+        serviceMapAll.forEach((serviceName,value)->{
+            if(value.rules!=null){
+                //要检查的!
+                checkAllIPWarning(serviceName,value,minute);
+            }else if(value.checked==0){
+                //新key 检查一下
+                ArrayList<AlertRulesPrepare.Rule> rules = ruleMaps.checkIfInRule(serviceName);
                 if (rules != null) {
                     //这个是新规则 要进行初始化
-                    ruleIpPayload = new RuleIpPayload();
-                    serviceMapWithRule.put(key, ruleIpPayload);
-                    ruleIpPayload.ipHashMap = new HashMap<>();
-                    ruleIpPayload.rules = rules;
-                    value.forEach((ip, SRP99) -> {
-
-                    });
-                } else {
-                    //这个不在规则里
-                    return;
+                    value.rules=rules;
+                    //然后进行检查
+                    checkAllIPWarning(serviceName,value,minute);
                 }
-            }
-            //进行报警检查
-
+                value.checked=1;
+            }//跳过
 
         });
+
 
     }
 
@@ -79,6 +138,8 @@ public class HashMapMergeThread extends Thread {
         int timeIndex = minute - firstMinute;
 
         serviceMapAll.forEach((key, value) -> {
+            //这分钟没merge 说明是空的
+            if(value.lastRefreshTime<minute)return;
             value.ipHashMap.forEach((key2, value2) -> {
                 SRAndP99Payload payload = value2.payload[timeIndex];
                 if (payload == null) return;
@@ -100,7 +161,7 @@ public class HashMapMergeThread extends Thread {
             serviceMap.forEach((key, value) -> {
 
                 RuleIpPayload valuePackage = serviceMapAll.computeIfAbsent(key, k -> new RuleIpPayload());
-
+                valuePackage.lastRefreshTime=minute;
                 value.forEach((ip, srp99) -> {
 
                     RuleStatePayload payload = valuePackage.ipHashMap.computeIfAbsent(ip, k -> new RuleStatePayload(srp99, timeIndex));
@@ -197,7 +258,7 @@ public class HashMapMergeThread extends Thread {
                 //等待这个buffer处理完毕
                 bl.countdown.await();
                 if (firstMinute == -1) {
-
+                    warningList=new ArrayList<>(5000);
                     firstMinute = DistributeBufferThread.baseMinuteTime;
                     solvedMinute = firstMinute;
                     threads = DataPrepareManager.rawBufferSolveThreadArray;
@@ -224,7 +285,7 @@ public class HashMapMergeThread extends Thread {
                     SolveMinuteP99AndSR2(i);
 
                     //进行报警处理
-
+                    doWarning(i);
                     solvedMinute = i + 1;
                 }
                 if (bl.id == -1) {

@@ -7,7 +7,11 @@ public final class ByteString {
     int length;
     int middle;
     int offset = 0;
-
+    void appendStringBuilder(StringBuilder sb){
+        for (int a = offset; a < length; ++a) {
+            sb.append((char)value[a]);
+        }
+    }
     ByteString() {
 
     }
@@ -17,7 +21,7 @@ public final class ByteString {
     }
 
     ByteString second() {
-        return new ByteString(value, length - middle, 0, middle);
+        return new ByteString(value, length, 0, middle);
     }
 
     ByteString(String s) {

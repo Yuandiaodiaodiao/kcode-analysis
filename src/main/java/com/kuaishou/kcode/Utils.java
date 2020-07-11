@@ -63,5 +63,25 @@ public class Utils {
         int minTime = secondTime / 60;
         return minTime;
     }
+    static void firstIp2StringBuilder(long ipTwo,StringBuilder sb){
+        long ip1 = (ipTwo >>> 32);
+        sb.append((int) ((ip1 >> 24) & 0x000000FF));
+        sb.append('.');
+        sb.append((int) ((ip1 >> 16) & 0x000000FF));
+        sb.append('.');
+        sb.append((int) ((ip1 >> 8) & 0x000000FF));
+        sb.append('.');
+        sb.append((int) (ip1 & 0x000000FF));
+    }
+    static void secondIp2StringBuilder(long ipTwo,StringBuilder sb){
+        int ip2 = (int) (long) (ipTwo);
+        sb.append((int) ((ip2 >> 24) & 0x000000FF));
+        sb.append('.');
+        sb.append((int) ((ip2 >> 16) & 0x000000FF));
+        sb.append('.');
+        sb.append((int) ((ip2 >> 8) & 0x000000FF));
+        sb.append('.');
+        sb.append((int) (ip2 & 0x000000FF));
+    }
 
 }

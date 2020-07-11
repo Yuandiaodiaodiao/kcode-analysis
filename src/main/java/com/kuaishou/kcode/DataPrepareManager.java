@@ -60,7 +60,9 @@ public class DataPrepareManager {
             e.printStackTrace();
         }
     }
-
+    public ArrayList<String>getAnswer1(){
+        return mergeThread.warningList;
+    }
     public int getServicePairNum() {
         int i = 0;
 
