@@ -59,7 +59,7 @@ public class HashMapMergeThread extends Thread {
         if(ruleIpPayload.lastRefreshTime==minute&& ruleIpPayload.ipHashMap!=null && ruleIpPayload.ipHashMap.size()>0){
             //检查
             ruleIpPayload.ipHashMap.forEach((ip,srp99)->{
-                SRAndP99Payload payload=srp99.payload[minute];
+                SRAndP99Payload payload=srp99.payload[minute-firstMinute];
                 if(payload==null)return;
                 final ArrayList<AlertRulesPrepare.Rule> rules = ruleIpPayload.rules;
                 final ArrayList<RuleState> states = srp99.states;
@@ -79,7 +79,7 @@ public class HashMapMergeThread extends Thread {
                     if(r.matchOnce(payload)){
 
                         state.warningTimes++;
-                        if(state.warningTimes>r.timeThreshold){
+                        if(state.warningTimes>=r.timeThreshold){
                             //报警
                             stringBuilder.setLength(0);
                             stringBuilder.append(r.id);

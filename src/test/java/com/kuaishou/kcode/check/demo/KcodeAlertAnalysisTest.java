@@ -42,9 +42,19 @@ public class KcodeAlertAnalysisTest {
         // Q2Result-2.txt，第二问输出和结果
         String q2ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q2Result-2.txt";
 
-
+        String sourceFilePath3 = "D:\\Github\\kcodedata\\data3\\kcodeAlertForStudent-test.data";
+        // ruleForStudent-2，报警规则
+        String ruleFilePath3 = "D:\\Github\\kcodedata\\data3\\ruleForStudent-test.txt";
+        // Q1Result-2.txt，第一问结果
+        String q1ResultFilePath3 = "D:\\Github\\kcodedata\\data3\\Q1Result-test.data";
+        // Q2Result-2.txt，第二问输出和结果
+        String q2ResultFilePath3 = "D:\\Github\\kcodedata\\data3\\Q2Answer-test.data";
         testQuestion12(sourceFilePath1, ruleFilePath1, q1ResultFilePath1, q2ResultFilePath1);
+
+        testQuestion12(sourceFilePath3, ruleFilePath3, q1ResultFilePath3, q2ResultFilePath3);
+
         testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
+
 
 
 

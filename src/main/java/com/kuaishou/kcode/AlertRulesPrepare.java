@@ -91,7 +91,7 @@ public class AlertRulesPrepare {
             r.judgeType=(stringArray[4].charAt(stringArray[4].length()-1)=='>');
             if(r.type==1){
                 //SR
-                r.thresholdSR=String2Double(stringArray[5]);
+                r.thresholdSR=String2Double(stringArray[5])/100;
             }else{
                 r.thresholdP99=String2Int(stringArray[5]);
             }

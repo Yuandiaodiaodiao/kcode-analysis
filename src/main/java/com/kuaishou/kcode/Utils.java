@@ -2,6 +2,8 @@ package com.kuaishou.kcode;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Utils {
     static Field byteBufferArrayField;
@@ -82,6 +84,19 @@ public class Utils {
         sb.append((int) ((ip2 >> 8) & 0x000000FF));
         sb.append('.');
         sb.append((int) (ip2 & 0x000000FF));
+    }
+    static void getAnswer1Type(ArrayList<String> as){
+
+
+
+        HashSet<Integer>set=new HashSet<>();
+        for(String s:as){
+            String[] ss=s.split(",");
+            set.add(Integer.parseInt(ss[0]));
+        }
+        for (Integer integer : set) {
+            System.out.println("报警"+integer);
+        }
     }
 
 }

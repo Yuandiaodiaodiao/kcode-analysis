@@ -23,11 +23,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t1.output("read 耗时");
         System.gc();
         String s=AnalyzeData.printMemoryInfo();
-
+        Utils.getAnswer1Type(ans);
         if(DistributeBufferThread.baseMinuteTime>0){
             throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime()+"R="+alertRules.size()+"K="+manager.getServicePairNum()+"A="+ans.size()    );
         }
-        return null;
+        return ans;
     }
 
     @Override

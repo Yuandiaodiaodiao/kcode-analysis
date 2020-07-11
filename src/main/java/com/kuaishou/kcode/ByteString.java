@@ -7,6 +7,13 @@ public final class ByteString {
     int length;
     int middle;
     int offset = 0;
+    public String toString(){
+        StringBuilder sb=new StringBuilder();
+        for (int a = offset; a < length; ++a) {
+            sb.append((char)value[a]);
+        }
+        return sb.toString();
+    }
     void appendStringBuilder(StringBuilder sb){
         for (int a = offset; a < length; ++a) {
             sb.append((char)value[a]);
@@ -82,7 +89,7 @@ public final class ByteString {
     public ByteString deepClone() {
         byte[] value2 = new byte[length];
         System.arraycopy(value, offset, value2, 0, length);
-        return new ByteString(value2, length, middle);
+        return new ByteString(value2, length, middle,offset);
     }
 
     public int hashCode() {
@@ -95,10 +102,10 @@ public final class ByteString {
 
     public boolean equals(Object obj) {
         ByteString bs = (ByteString) obj;
-        if (this.length == bs.length && this.middle == bs.middle) {
+        if (this.length-offset == bs.length-bs.offset && this.middle == bs.middle) {
             //倒着比较
-            for (int i = length - 1; i >= offset; --i) {
-                if (value[i] != bs.value[i]) {
+            for (int i = length-1,j=bs.length-1; i >= offset; --i,--j) {
+                if (value[i] != bs.value[j]) {
                     return false;
                 }
             }

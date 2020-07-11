@@ -128,7 +128,7 @@ public class RawBufferSolveThread extends Thread {
 //            int ipHash = (int) ((((ip1 - 167772160) % 3457) << 9) + ((ip2 - 167772160) % 2833)) % 2551;
             long twoIPs = (ip1 << 32) + ip2;
             HashMap<ByteString, HashMap<Long, SingleIpPayload>> serviceMap = timeNameIpStore[minTime - firstTime];
-            ByteString twoServiceName = new ByteString(serviceAll, serviceBLength + 1,serviceALength);
+            ByteString twoServiceName = new ByteString(serviceAll, serviceBLength + 1,serviceALength+1);
 //            //5.6s
 //            twoServiceName.hashCode();
 
@@ -136,6 +136,7 @@ public class RawBufferSolveThread extends Thread {
             HashMap<Long, SingleIpPayload> ipMap = serviceMap.get(twoServiceName);
             if (ipMap == null) {
                 ipMap = new HashMap<>();
+
                 serviceMap.put(twoServiceName.deepClone(), ipMap);
                 SingleIpPayload payload = new SingleIpPayload();
                 ipMap.put(twoIPs, payload);
