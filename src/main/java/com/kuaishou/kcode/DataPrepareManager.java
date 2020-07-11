@@ -11,12 +11,13 @@ public class DataPrepareManager {
     DiskReadThread diskRead;
     DistributeBufferThread distributeBuffer;
     HashMapMergeThread mergeThread;
-    static RawBufferSolveThread[] rawBufferSolveThreadArray=new RawBufferSolveThread[16];
-    static int THREAD_NUMBER=4;
+    static RawBufferSolveThread[] rawBufferSolveThreadArray = new RawBufferSolveThread[16];
+    static int THREAD_NUMBER = 4;
+
     DataPrepareManager() {
         diskRead = new DiskReadThread();
         distributeBuffer = new DistributeBufferThread();
-        mergeThread=new HashMapMergeThread();
+        mergeThread = new HashMapMergeThread();
         ArrayBlockingQueue<ByteBuffer> canuse = new ArrayBlockingQueue<ByteBuffer>(8);
         ArrayBlockingQueue<ByteBuffer> canread = new ArrayBlockingQueue<ByteBuffer>(8);
         ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(16);
@@ -27,8 +28,8 @@ public class DataPrepareManager {
         diskRead.LinkBlockingQueue(canuse, canread);
         distributeBuffer.LinkDirectBufferBlockingQueue(canuse, canread);
         distributeBuffer.LinkHeapBufferBlockingQueue(unsolvedBuffer, solvedBuffer);
-        for(int i=0;i<THREAD_NUMBER;++i){
-            rawBufferSolveThreadArray[i]=new RawBufferSolveThread();
+        for (int i = 0; i < THREAD_NUMBER; ++i) {
+            rawBufferSolveThreadArray[i] = new RawBufferSolveThread();
             rawBufferSolveThreadArray[i].LinkHeapBufferBlockingQueue(unsolvedBuffer, solvedBuffer);
         }
     }
@@ -39,13 +40,14 @@ public class DataPrepareManager {
         distributeBuffer.setReadTimes(readTimes);
         diskRead.start();
         distributeBuffer.start();
-        for(int i=0;i<THREAD_NUMBER;++i){
+        for (int i = 0; i < THREAD_NUMBER; ++i) {
             rawBufferSolveThreadArray[i].start();
         }
         //这个位置预处理alertRules
-        ArrayList<AlertRulesPrepare.Rule> ruleArray=AlertRulesPrepare.prepare(alertRules);
-        AlertRulesPrepare.RuleMaps rm=AlertRulesPrepare.prepare3HashMap(ruleArray);
+        ArrayList<AlertRulesPrepare.Rule> ruleArray = AlertRulesPrepare.prepare(alertRules);
+        AlertRulesPrepare.RuleMaps rm = AlertRulesPrepare.prepare3HashMap(ruleArray);
         //rules处理好之后在merge每分钟之后进行报警处理
+        mergeThread.setRuleMaps(rm);
         mergeThread.start();
     }
 
@@ -58,14 +60,15 @@ public class DataPrepareManager {
             e.printStackTrace();
         }
     }
-    public int getServicePairNum(){
-        int i=0;
-        for(int j=0;j<=32;++j){
-            HashMap<ByteString, HashMap<Long, SingleIpPayload>>m= mergeThread.timeNameIpStore[j];
-            if(m!=null){
-                i=Math.max(i,m.keySet().size());
-            }
+
+    public int getServicePairNum() {
+        int i = 0;
+
+        HashMap<ByteString, HashMapMergeThread.RuleIpPayload> m = mergeThread.serviceMapAll;
+        if (m != null) {
+            i = Math.max(i, m.keySet().size());
         }
+
         return i;
     }
 }

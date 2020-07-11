@@ -23,6 +23,34 @@ public class AlertRulesPrepare {
         HashMap<ByteString,ArrayList<Rule>> all2name=new HashMap<>();
         //主调服务固定 作为索引
         HashMap<ByteString,ArrayList<Rule>> name2all=new HashMap<>();
+
+        ArrayList<Rule> checkIfInRule(ByteString bs){
+            ArrayList<Rule>ans;
+            ArrayList<Rule>name2nameValue=name2name.get(bs);
+            ArrayList<Rule>all2nameValue=all2name.get(bs.second());
+            ArrayList<Rule>name2allValue=name2all.get(bs.first());
+            if(name2allValue!=null || all2nameValue!=null || name2nameValue!=null){
+                ans=new ArrayList<>();
+                if(name2nameValue!=null){
+                    for(Rule r:name2nameValue){
+                        ans.add(r);
+                    }
+                }
+                if(all2nameValue!=null){
+                    for(Rule r:all2nameValue){
+                        ans.add(r);
+                    }
+                }
+                if(name2allValue!=null){
+                    for(Rule r:name2allValue){
+                        ans.add(r);
+                    }
+                }
+                return ans;
+            }else{
+                return null;
+            }
+        }
     }
 
     static RuleMaps prepare3HashMap(ArrayList<Rule> ruleArrayList){
