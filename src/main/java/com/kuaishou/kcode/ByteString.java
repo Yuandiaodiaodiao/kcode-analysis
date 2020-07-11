@@ -12,28 +12,37 @@ public final class ByteString {
     ByteString(String s) {
         length=s.length();
         middle=0;
-        try {
-            value=Utils.getStringByteArray(s);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        value=s.getBytes();
+//
+//        try {
+//            value=Utils.getStringByteArray(s);
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
     }
     ByteString(String s1,String s2) {
         length=s1.length()+s2.length();
         middle=s1.length();
         value=new byte[length];
-        try {
-            byte[] value1=Utils.getStringByteArray(s1);
-            System.arraycopy(value1,0,value,0,s1.length());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        for(int i=0;i<middle;++i){
+            value[i]= (byte) s1.charAt(i);
         }
-        try {
-            byte[] value1=Utils.getStringByteArray(s2);
-            System.arraycopy(value1,0,value,s1.length(),s2.length());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        for(int i=middle;i<length;++i){
+            value[i]= (byte) s2.charAt(i-middle);
         }
+
+//        try {
+//            byte[] value1=Utils.getStringByteArray(s1);
+//            System.arraycopy(value1,0,value,0,s1.length());
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            byte[] value1=Utils.getStringByteArray(s2);
+//            System.arraycopy(value1,0,value,s1.length(),s2.length());
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**

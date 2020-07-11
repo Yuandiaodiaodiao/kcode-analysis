@@ -3,6 +3,7 @@ package com.kuaishou.kcode;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class DataPrepareManager {
@@ -56,5 +57,15 @@ public class DataPrepareManager {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    public int getServicePairNum(){
+        int i=0;
+        for(int j=0;j<=32;++j){
+            HashMap<ByteString, HashMap<Long, SingleIpPayload>>m= mergeThread.timeNameIpStore[j];
+            if(m!=null){
+                i=Math.max(i,m.keySet().size());
+            }
+        }
+        return i;
     }
 }
