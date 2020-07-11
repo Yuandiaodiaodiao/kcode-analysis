@@ -101,6 +101,7 @@ public class HashMapMergeThread extends Thread{
                     mergeHashmap(i);
                     //进行桶排 处理p99和sr
                     SolveMinuteP99AndSR(i);
+                    //进行报警处理
                     solvedMinute=i+1;
                 }
                 if(bl.id==-1){

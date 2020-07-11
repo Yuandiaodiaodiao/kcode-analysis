@@ -13,6 +13,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
+
         TimeRange t1=new TimeRange();
         manager.start(path,alertRules);
         manager.stop();
@@ -22,8 +23,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         String s=AnalyzeData.printMemoryInfo();
 
         if(DistributeBufferThread.baseMinuteTime>0){
-
-            throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime());
+            throw new ArrayIndexOutOfBoundsException("RAM"+s+"耗时"+t1.firstTime()+"R="+alertRules.size() );
         }
         return null;
     }

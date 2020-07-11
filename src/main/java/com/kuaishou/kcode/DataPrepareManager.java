@@ -1,6 +1,7 @@
 package com.kuaishou.kcode;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -40,6 +41,10 @@ public class DataPrepareManager {
         for(int i=0;i<THREAD_NUMBER;++i){
             rawBufferSolveThreadArray[i].start();
         }
+        //这个位置预处理alertRules
+        ArrayList<AlertRulesPrepare.Rule> ruleArray=AlertRulesPrepare.prepare(alertRules);
+        AlertRulesPrepare.RuleMaps rm=AlertRulesPrepare.prepare3HashMap(ruleArray);
+        //rules处理好之后在merge每分钟之后进行报警处理
         mergeThread.start();
     }
 
