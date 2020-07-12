@@ -19,6 +19,7 @@ public final class ByteString {
             sb.append((char)value[a]);
         }
     }
+
     ByteString() {
 
     }
@@ -31,6 +32,19 @@ public final class ByteString {
         return new ByteString(value, length, 0, middle);
     }
 
+    ByteString(int cap){
+        value=new byte[cap];
+    }
+    void fromString(String s1, String s2) {
+        length = s1.length() + s2.length();
+        middle = s1.length();
+        for (int i = 0; i < middle; ++i) {
+            value[i] = (byte) s1.charAt(i);
+        }
+        for (int i = middle; i < length; ++i) {
+            value[i] = (byte) s2.charAt(i - middle);
+        }
+    }
     ByteString(String s) {
         length = s.length();
         middle = 0;

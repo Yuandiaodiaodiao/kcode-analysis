@@ -60,6 +60,18 @@ public class DataPrepareManager {
             e.printStackTrace();
         }
     }
+    HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
+    public void prepareQ2(){
+        DAGPrepare dag=new DAGPrepare(mergeThread.firstMinute);
+        dag.serviceMapAll=mergeThread.serviceMapAll;
+        dag.convertServiceName2VertexId();
+        dag.buildDAG();
+        dag.topsort();
+        dag.solveMaxPathLength();
+        dag.solveVertexPath();
+        dag.generateAnswer();
+        Q2Answer=dag.Q2Answer;
+    }
     public ArrayList<String>getAnswer1(){
         return mergeThread.warningList;
     }

@@ -16,7 +16,20 @@ public class AlertRulesPrepare {
         double thresholdSR;
         int thresholdP99;
         boolean matchOnce(SRAndP99Payload payload){
-            return (type==1)?(payload.rate>thresholdSR==judgeType):(payload.p99>thresholdP99==judgeType);
+            if(type==1){
+                if(judgeType){
+                    return payload.rate>thresholdSR;
+                }else{
+                    return payload.rate<thresholdSR;
+                }
+            }else{
+                if(judgeType){
+                    return payload.p99>thresholdP99;
+                }else{
+                    return payload.p99<thresholdP99;
+                }
+            }
+//            return (type==1)?(payload.rate>thresholdSR==judgeType):(payload.p99>thresholdP99==judgeType);
         }
     }
     public static class RuleMaps{

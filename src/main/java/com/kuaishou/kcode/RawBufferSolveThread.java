@@ -74,7 +74,11 @@ public class RawBufferSolveThread extends Thread {
         int limit = buffer.limit() - 1;
 
         byte[] serviceAll = new byte[128];
+        if(byteArray[position+1]=='\n'){
+            ++position;
+        }
         while (position < limit) {
+
             long ip1 = 0;
             long ip2 = 0;
             int serviceALength = -1;

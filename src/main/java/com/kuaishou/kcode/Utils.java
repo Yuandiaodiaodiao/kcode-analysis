@@ -7,7 +7,6 @@ import java.util.HashSet;
 
 public class Utils {
     static Field byteBufferArrayField;
-    static Field stringField;
     static {
         try {
             byteBufferArrayField = ByteBuffer.allocate(1).getClass().getSuperclass().getDeclaredField("hb");
@@ -16,6 +15,8 @@ public class Utils {
         }
         byteBufferArrayField.setAccessible(true);
     }
+    static Field stringField;
+
     static {
         try {
             stringField = String.class.getDeclaredField("value");
@@ -24,8 +25,8 @@ public class Utils {
         }
         stringField.setAccessible(true);
     }
-    public static byte[] getStringByteArray(String s) throws IllegalAccessException {
-        return (byte[])stringField.get(s);
+    public static char[] getStringByteArray(String s) throws IllegalAccessException {
+        return (char[])stringField.get(s);
     }
 
     public static byte[] getHeapByteBufferArray(ByteBuffer b) throws IllegalAccessException {
@@ -95,7 +96,7 @@ public class Utils {
             set.add(Integer.parseInt(ss[0]));
         }
         for (Integer integer : set) {
-            System.out.println("报警"+integer);
+//            System.out.println("报警"+integer);
         }
     }
 

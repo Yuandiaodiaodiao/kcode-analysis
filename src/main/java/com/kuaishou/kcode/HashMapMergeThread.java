@@ -38,13 +38,13 @@ public class HashMapMergeThread extends Thread {
         RuleIpPayload() {
             this.ipHashMap = new HashMap<>();
         }
+        SRAndP99Payload[] serviceLevelPayload=new SRAndP99Payload[64];
         int lastRefreshTime=-1;
         int checked=0;
         ArrayList<AlertRulesPrepare.Rule> rules;
         HashMap<Long, RuleStatePayload> ipHashMap;
     }
 
-    HashMap<ByteString, RuleIpPayload> serviceMapWithRule;
     HashMap<ByteString, RuleIpPayload> serviceMapAll;
     int firstMinute = -1;
     int solvedMinute = -1;
@@ -84,7 +84,7 @@ public class HashMapMergeThread extends Thread {
                             stringBuilder.setLength(0);
                             stringBuilder.append(r.id);
                             stringBuilder.append(',');
-                            stringBuilder.append(dataFormat.format(new Date(((long)firstMinute+minute)*60)));
+                            stringBuilder.append(dataFormat.format(new Date(((long)minute)*60000)));
                             stringBuilder.append(',');
                             serviceName.first().appendStringBuilder(stringBuilder);
                             stringBuilder.append(',');
@@ -133,8 +133,7 @@ public class HashMapMergeThread extends Thread {
 
 
     }
-
-    void SolveMinuteP99AndSR2(int minute) {
+    void SolveMinuteP99AndSR2(int minute){
         int timeIndex = minute - firstMinute;
 
         serviceMapAll.forEach((key, value) -> {
@@ -146,6 +145,30 @@ public class HashMapMergeThread extends Thread {
                 payload.p99 = solveP99(payload.bucket, payload.total);
                 payload.rate = ((double) payload.success) / payload.total;
             });
+        });
+    }
+    void SolveServiceLevelSRAndP99(int minute) {
+        int timeIndex = minute - firstMinute;
+
+        serviceMapAll.forEach((key, value) -> {
+            //这分钟没merge 说明是空的
+            if(value.lastRefreshTime<minute)return;
+            SRAndP99Payload servicePayload=new SRAndP99Payload();
+            value.serviceLevelPayload[timeIndex]=servicePayload;
+            value.ipHashMap.forEach((key2, value2) -> {
+                SRAndP99Payload payload = value2.payload[timeIndex];
+                if (payload == null) return;
+                servicePayload.success += payload.success;
+                servicePayload.total += payload.total;
+                for (int i = 0; i < 300; ++i) {
+                    servicePayload.bucket[i] += payload.bucket[i];
+                }
+                //释放内存
+                payload.bucket=null;
+            });
+            servicePayload.p99=solveP99(servicePayload.bucket,servicePayload.total);
+            servicePayload.rate=((double)servicePayload.success)/servicePayload.total;
+            servicePayload.bucket=null;
         });
 //        System.out.println("最大bucker="+maxBucket);
     }
@@ -219,7 +242,7 @@ public class HashMapMergeThread extends Thread {
 
     static int maxBucket = 0;
 
-    int solveP99(int[] bucket, int allNum) {
+    static int solveP99(int[] bucket, int allNum) {
         double i = 0.99 * allNum;
         int p99 = (int) Math.ceil(i);
         int bucketIndex = bucket.length;
@@ -262,7 +285,6 @@ public class HashMapMergeThread extends Thread {
                     firstMinute = DistributeBufferThread.baseMinuteTime;
                     solvedMinute = firstMinute;
                     threads = DataPrepareManager.rawBufferSolveThreadArray;
-                    serviceMapWithRule = new HashMap<>();
                 }
                 if (timeNameIpStore == null) {
                     //初始化线程独有的数据结构 [time][name][ip]
@@ -286,6 +308,8 @@ public class HashMapMergeThread extends Thread {
 
                     //进行报警处理
                     doWarning(i);
+                    //进行service-service粒度的聚合
+                    SolveServiceLevelSRAndP99(i);
                     solvedMinute = i + 1;
                 }
                 if (bl.id == -1) {
