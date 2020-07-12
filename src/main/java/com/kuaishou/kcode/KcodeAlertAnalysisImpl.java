@@ -106,6 +106,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
+        long ts = System.currentTimeMillis();
         try {
             // ----------------------- rule -----------------------------
             prepare_rule(alertRules);
@@ -173,7 +174,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //            System.out.println(s);
 //        }
         tt = 0;
-        return main_ans1;
+        long te = System.currentTimeMillis();
+        Runtime run = Runtime.getRuntime();
+        throw new IndexOutOfBoundsException("一阶段耗时: " + (te - ts) + "ms, "
+                +"JVM的空闲内容量: " + run.freeMemory()
+                +", JVM的内存量: " + run.totalMemory()
+        );
+//        return main_ans1;
     }
 
     public static long tt = 0;
