@@ -25,8 +25,14 @@ public class Utils {
         }
         stringField.setAccessible(true);
     }
-    public static char[] getStringByteArray(String s) throws IllegalAccessException {
-        return (char[])stringField.get(s);
+    static char[]sss;
+    public static char[] getStringByteArray(String s)  {
+        try {
+            return (char[])stringField.get(s);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return sss;
     }
     public static String setStringByteArray(byte[] bs,int length){
         String s= "";
