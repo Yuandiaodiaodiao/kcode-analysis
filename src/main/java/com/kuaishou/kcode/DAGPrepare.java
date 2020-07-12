@@ -331,8 +331,8 @@ public class DAGPrepare {
 
                         }
                         for (int j = 0; j < b2.vertexArrayList.size() - 2; ++j) {
-                            int f = b1.vertexArrayList.get(j);
-                            int t = b1.vertexArrayList.get(j + 1);
+                            int f = b2.vertexArrayList.get(j);
+                            int t = b2.vertexArrayList.get(j + 1);
                             Edge e = GMatrix[f][t];
                             if(e==null){
                                 System.out.println("e=null");

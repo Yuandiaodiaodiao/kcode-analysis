@@ -26,7 +26,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t1.point();
         t1.output("read 耗时");
         System.gc();
-        String s=AnalyzeData.printMemoryInfo();
+//        String s=AnalyzeData.printMemoryInfo();
 //        Utils.getAnswer1Type(ans);
 
 
