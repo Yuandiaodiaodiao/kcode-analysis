@@ -94,6 +94,7 @@ public class KcodeAlertAnalysisTest {
         // Q2
         Map<Q2Input, Set<Q2Result>> q2Result = createQ2Result(q2ResultFilePath);
         long cast = 0L;
+
         for (Map.Entry<Q2Input, Set<Q2Result>> entry : q2Result.entrySet()) {
             Q2Input q2Input = entry.getKey();
             start = System.nanoTime();

@@ -66,23 +66,24 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //
 //        }
         tt.point();
+        time.charAt(0);
+        caller.charAt(0);
+        caller.charAt(0);
+        tt.point();
         int y = time.charAt(0) * 1000 + time.charAt(1) * 100 + time.charAt(2) * 10 + time.charAt(3) - 53328;
         int M = time.charAt(5) * 10 + time.charAt(6) - 530;
         int d = time.charAt(8) * 10 + time.charAt(9) - 528;
         int H = time.charAt(11) * 600 + time.charAt(12) * 60 - 31680;
         int m = time.charAt(14) * 10 + time.charAt(15) - 528;
-        tt.point();
         y -= M <= 0 ? 1 : 0;
         M += M <= 0 ? 12 : 0;
         int day = y / 4 - y / 100 + y / 400 + 367 * M / 12 + d + y * 365 - 719499;
         int t = day * 1440 + H - 480 + m - firstMinute;
-        tt.point();
         t = (t < 0 || t > maxMinute) ? maxMinute + 1 : t;
         tt.point();
         bs.fromString(caller, responder);
         tt.point();
         DAGPrepare.AnswerStructure ans = Q2Answer.get(bs);
-        tt.point();
         Collection<String> an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
         tt.point();
         tt.outputns();
