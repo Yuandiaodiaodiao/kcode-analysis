@@ -172,11 +172,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        for (String s : main_ans1) {
 //            System.out.println(s);
 //        }
-//        tt = 0;
+        tt = 0;
         return main_ans1;
     }
 
-//    public static long tt = 0;
+    public static long tt = 0;
 
     @Override
     public final Collection<String> getLongestPath(String caller, String responder, String time, String type) {
@@ -196,7 +196,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         M += M <= 0 ? 12 : 0;
         int day = y / 4 - y / 100 + y / 400 + 367 * M / 12 + d + y * 365 - 719499;
         int t = (day * 24 + H - 8) * 60 + m - minute_begin;
-//        int t = get_minute(time) - minute_begin;
         // -------------------------- get minute ------------------------------
         int nt = t < 0 || t > minute_end ? minute_end + 1 : t;
         hs.add3(caller, responder, type);
