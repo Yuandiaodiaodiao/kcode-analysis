@@ -91,12 +91,13 @@ public class DAGPrepare {
     ArrayList<Edge>[] G;
     //反图
     ArrayList<Edge>[] GT;
-    Edge[][]GMatrix;
+    Edge[][] GMatrix;
+
     /**
      * 给定v-v 建正图和反图
      */
     void buildDAG() {
-        GMatrix=new Edge[vertexArray.size()][vertexArray.size()];
+        GMatrix = new Edge[vertexArray.size()][vertexArray.size()];
 //        for(int i=0;i<GMatrix.length;++i){
 //            GMatrix[i]=new Edge[GMatrix.length];
 //        }
@@ -114,8 +115,8 @@ public class DAGPrepare {
             int to = vertexMap.get(key.second()).id;
             vertexArray.get(to).inDegree++;
             allIn.getAndIncrement();
-            Edge e1=new Edge(from, to, value.serviceLevelPayload);
-            GMatrix[from][to]=e1;
+            Edge e1 = new Edge(from, to, value.serviceLevelPayload);
+            GMatrix[from][to] = e1;
             G[from].add(e1);
             vertexArray.get(from).TinDegree++;
             GT[to].add(new Edge(to, from, value.serviceLevelPayload));
@@ -264,6 +265,7 @@ public class DAGPrepare {
         ByteString bs;
         ArrayList<Integer> vertexArrayList;
     }
+
     static DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
     void generateAnswer() {
@@ -275,64 +277,64 @@ public class DAGPrepare {
             ArrayList<ByteStringAndVertex> bav2 = genPathFromTree(to, 0);
             AnswerStructure ans = new AnswerStructure();
 
-            FastStringBuilder builder = new FastStringBuilder((maxLength + 1) * 128 * 2);
+            FastStringBuilder srbuilder = new FastStringBuilder((maxLength + 1) * 128 * 2);
+            FastStringBuilder p99builder = new FastStringBuilder((maxLength + 1) * 128 * 2);
             for (ByteStringAndVertex b1 : bav1) {
                 for (ByteStringAndVertex b2 : bav2) {
 
-                    builder.append(b1.bs);
-                    builder.append("->");
-                    builder.append(b2.bs);
-                    builder.append('|');
-                    int index = builder.index;
+                    srbuilder.append(b1.bs);
+                    srbuilder.append("->");
+                    srbuilder.append(b2.bs);
+                    srbuilder.append('|');
+                    p99builder.append(b1.bs);
+                    p99builder.append("->");
+                    p99builder.append(b2.bs);
+                    p99builder.append('|');
+                    int index1 = srbuilder.index;
+                    int index2 = p99builder.index;
                     //处理minute SR
 
-                    for(int i=0;i<64;++i){
-                        for(int j=b1.vertexArrayList.size()-1;j>=1;--j){
-                            int f=b1.vertexArrayList.get(j);
-                            int t=b1.vertexArrayList.get(j-1);
-                            Edge e=GMatrix[f][t];
-                            SRAndP99Payload payload=e.payloadArray[i];
-                            if(payload!=null&&payload.total>0){
-                                builder.append(DFORMAT.format(payload.rate));
-                            }else{
-                                builder.append("-1%");
+                    for (int i = 0; i < 32; ++i) {
+                        for (int j = b1.vertexArrayList.size() - 1; j >= 1; --j) {
+                            int f = b1.vertexArrayList.get(j);
+                            int t = b1.vertexArrayList.get(j - 1);
+                            Edge e = GMatrix[f][t];
+                            SRAndP99Payload payload = e.payloadArray[i];
+                            if (payload != null && payload.total > 0) {
+                                srbuilder.append(DFORMAT.format(payload.rate));
+                            } else {
+                                srbuilder.append("-1%");
                             }
-                            builder.append(',');
+                            srbuilder.append(',');
                         }
                         {
-                            Edge e=GMatrix[from.id][to.id];
-                            SRAndP99Payload payload=e.payloadArray[i];
-                            if(payload!=null&&payload.total>0){
-                                builder.append(DFORMAT.format(payload.rate));
-                            }else{
-                                builder.append("-1%");
+                            Edge e = GMatrix[from.id][to.id];
+                            SRAndP99Payload payload = e.payloadArray[i];
+                            if (payload != null && payload.total > 0) {
+                                srbuilder.append(DFORMAT.format(payload.rate));
+                            } else {
+                                srbuilder.append("-1%");
                             }
-                            builder.append(',');
+                            srbuilder.append(',');
 
                         }
-                        for(int j=0;j<b2.vertexArrayList.size()-2;++j){
-                            int f=b1.vertexArrayList.get(j);
-                            int t=b1.vertexArrayList.get(j+1);
-                            Edge e=GMatrix[f][t];
-                            SRAndP99Payload payload=e.payloadArray[i];
-                            if(payload!=null&&payload.total>0){
-                                builder.append(DFORMAT.format(payload.rate));
-                            }else{
-                                builder.append("-1%");
+                        for (int j = 0; j < b2.vertexArrayList.size() - 2; ++j) {
+                            int f = b1.vertexArrayList.get(j);
+                            int t = b1.vertexArrayList.get(j + 1);
+                            Edge e = GMatrix[f][t];
+                            SRAndP99Payload payload = e.payloadArray[i];
+                            if (payload != null && payload.total > 0) {
+                                srbuilder.append(DFORMAT.format(payload.rate));
+                            } else {
+                                srbuilder.append("-1%");
                             }
-                            builder.append(',');
+                            srbuilder.append(',');
                         }
-                        
-
-//                        ans.SRArray[i].add();
+                        //退掉最后一个,
+                        srbuilder.setLength(srbuilder.index-1);
+                        ans.SRArray[i].add(srbuilder.toString());
                     }
-                    //处理minute P99
-                    for(int i=0;i<64;++i){
 
-
-//                        ans.P99Array[i].add();
-
-                    }
                 }
             }
 //            ans.ansNum=a1.size()*a2.size();

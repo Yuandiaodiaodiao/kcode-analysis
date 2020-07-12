@@ -41,6 +41,9 @@ public class FastStringBuilder {
             }
         }
     }
+    public String toString(){
+        return Utils.setStringByteArray(value,index);
+    }
     ByteString toByteString(){
         ByteString bs=new ByteString(index);
         bs.offset=0;

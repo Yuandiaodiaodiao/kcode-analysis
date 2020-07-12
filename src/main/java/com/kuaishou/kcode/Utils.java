@@ -28,7 +28,17 @@ public class Utils {
     public static char[] getStringByteArray(String s) throws IllegalAccessException {
         return (char[])stringField.get(s);
     }
-
+    public static String setStringByteArray(byte[] bs,int length){
+        String s= "";
+        char[] c=new char[length];
+        System.arraycopy(bs,0,c,0,length);
+        try {
+            stringField.set(s,bs);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
     public static byte[] getHeapByteBufferArray(ByteBuffer b) throws IllegalAccessException {
             return (byte[]) byteBufferArrayField.get(b);
     }
