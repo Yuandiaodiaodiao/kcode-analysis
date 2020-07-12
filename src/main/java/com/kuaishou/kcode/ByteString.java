@@ -36,13 +36,15 @@ public final class ByteString {
         value=new byte[cap];
     }
     void fromString(String s1, String s2) {
+        char[] c1=Utils.getStringByteArray(s1);
+        char[] c2=Utils.getStringByteArray(s2);
         length = s1.length() + s2.length();
         middle = s1.length();
         for (int i = 0; i < middle; ++i) {
-            value[i] = (byte) s1.charAt(i);
+            value[i] = (byte) c1[i];
         }
         for (int i = middle; i < length; ++i) {
-            value[i] = (byte) s2.charAt(i - middle);
+            value[i] = (byte) c2[i - middle];
         }
     }
     ByteString(String s) {
@@ -108,7 +110,7 @@ public final class ByteString {
 
     public int hashCode() {
         int hash = 0;
-        for (int a = offset; a < length; ++a) {
+        for (int a = offset; a < length; a+=2) {
             hash = 31 * hash + value[a];
         }
         return hash;

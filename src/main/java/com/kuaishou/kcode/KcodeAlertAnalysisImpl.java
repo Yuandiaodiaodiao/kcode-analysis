@@ -60,13 +60,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         int t = day * 1440 + H - 480 + m - firstMinute;
         t = (t < 0 || t > maxMinute) ? maxMinute + 1 : t;
         bs.fromString(caller, responder);
-        DAGPrepare.AnswerStructure ans = manager.Q2Answer.get(bs);
-        if (type.charAt(0) == 'S') {
-            //SR
-            return ans.SRArray[t];
-        } else {
-            //P99
-            return ans.P99Array[t];
-        }
+        DAGPrepare.AnswerStructure ans = Q2Answer.get(bs);
+        return type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
+
     }
 }

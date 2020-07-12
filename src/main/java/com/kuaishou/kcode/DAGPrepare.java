@@ -275,7 +275,7 @@ public class DAGPrepare {
     static DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
     void generateAnswer() {
-        Q2Answer = new HashMap<>(4096*4);
+        Q2Answer = new HashMap<>(4096);
         serviceMapAll.forEach((key, value) -> {
             Vertex from = vertexMap.get(key.first());
             Vertex to = vertexMap.get(key.second());
