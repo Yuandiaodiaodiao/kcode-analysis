@@ -51,12 +51,11 @@ public class HashString {
 
     @Override
     public boolean equals(Object obj) {
-        if (getClass() != obj.getClass()) return false;
+//        if (getClass() != obj.getClass()) return false;
         HashString hs = (HashString) obj;
         if (this.length != hs.length) return false;
-        for (int i = 0; i <= this.length / 2; i++) {
+        for (int i = 0; i <= this.length ; i++) {
             if (this.value[i] != hs.value[i]) return false;
-            if (this.value[this.length - i - 1] != hs.value[this.length - i - 1]) return false;
         }
         return true;
     }

@@ -100,6 +100,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     private final DecimalFormat decimal_format = new DecimalFormat("#.00%");
     private final HashString hs = new HashString();
 
+    public KcodeAlertAnalysisImpl() {
+        Tools.init();
+    }
+
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         try {
@@ -181,11 +185,12 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         // 时间可能不合法
 
         // -------------------------- get minute ------------------------------
-        int y = time.charAt(0) * 1000 + time.charAt(1) * 100 + time.charAt(2) * 10 + time.charAt(3) - '0' * 1111;
-        int M = time.charAt(5) * 10 + time.charAt(6) - '0' * 11;
-        int d = time.charAt(8) * 10 + time.charAt(9) - '0' * 11;
-        int H = time.charAt(11) * 10 + time.charAt(12) - '0' * 11;
-        int m = time.charAt(14) * 10 + time.charAt(15) - '0' * 11;
+        char[] ch = Tools.get_ch(time);
+        int y = ch[0] * 1000 + ch[1] * 100 + ch[2] * 10 + ch[3] - '0' * 1111;
+        int M = ch[5] * 10 + ch[6] - '0' * 11;
+        int d = ch[8] * 10 + ch[9] - '0' * 11;
+        int H = ch[11] * 10 + ch[12] - '0' * 11;
+        int m = ch[14] * 10 + ch[15] - '0' * 11;
         M -= 2;
         y -= M <= 0 ? 1 : 0;
         M += M <= 0 ? 12 : 0;
