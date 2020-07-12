@@ -1,5 +1,6 @@
 package com.kuaishou.kcode;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -90,11 +91,15 @@ public class DAGPrepare {
     ArrayList<Edge>[] G;
     //反图
     ArrayList<Edge>[] GT;
-
+    Edge[][]GMatrix;
     /**
      * 给定v-v 建正图和反图
      */
     void buildDAG() {
+        GMatrix=new Edge[vertexArray.size()][vertexArray.size()];
+//        for(int i=0;i<GMatrix.length;++i){
+//            GMatrix[i]=new Edge[GMatrix.length];
+//        }
         G = new ArrayList[vertexArray.size()];
         for (int i = 0; i < G.length; i++) {
             G[i] = new ArrayList<>();
@@ -109,7 +114,9 @@ public class DAGPrepare {
             int to = vertexMap.get(key.second()).id;
             vertexArray.get(to).inDegree++;
             allIn.getAndIncrement();
-            G[from].add(new Edge(from, to, value.serviceLevelPayload));
+            Edge e1=new Edge(from, to, value.serviceLevelPayload);
+            GMatrix[from][to]=e1;
+            G[from].add(e1);
             vertexArray.get(from).TinDegree++;
             GT[to].add(new Edge(to, from, value.serviceLevelPayload));
         });
@@ -257,6 +264,7 @@ public class DAGPrepare {
         ByteString bs;
         ArrayList<Integer> vertexArrayList;
     }
+    static DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
     void generateAnswer() {
         Q2Answer = new HashMap<>(4096);
@@ -279,15 +287,50 @@ public class DAGPrepare {
                     //处理minute SR
 
                     for(int i=0;i<64;++i){
+                        for(int j=b1.vertexArrayList.size()-1;j>=1;--j){
+                            int f=b1.vertexArrayList.get(j);
+                            int t=b1.vertexArrayList.get(j-1);
+                            Edge e=GMatrix[f][t];
+                            SRAndP99Payload payload=e.payloadArray[i];
+                            if(payload!=null&&payload.total>0){
+                                builder.append(DFORMAT.format(payload.rate));
+                            }else{
+                                builder.append("-1%");
+                            }
+                            builder.append(',');
+                        }
+                        {
+                            Edge e=GMatrix[from.id][to.id];
+                            SRAndP99Payload payload=e.payloadArray[i];
+                            if(payload!=null&&payload.total>0){
+                                builder.append(DFORMAT.format(payload.rate));
+                            }else{
+                                builder.append("-1%");
+                            }
+                            builder.append(',');
 
+                        }
+                        for(int j=0;j<b2.vertexArrayList.size()-2;++j){
+                            int f=b1.vertexArrayList.get(j);
+                            int t=b1.vertexArrayList.get(j+1);
+                            Edge e=GMatrix[f][t];
+                            SRAndP99Payload payload=e.payloadArray[i];
+                            if(payload!=null&&payload.total>0){
+                                builder.append(DFORMAT.format(payload.rate));
+                            }else{
+                                builder.append("-1%");
+                            }
+                            builder.append(',');
+                        }
+                        
 
-                        ans.SRArray[i].add()
+//                        ans.SRArray[i].add();
                     }
                     //处理minute P99
                     for(int i=0;i<64;++i){
 
 
-                        ans.P99Array[i].add()
+//                        ans.P99Array[i].add();
 
                     }
                 }
