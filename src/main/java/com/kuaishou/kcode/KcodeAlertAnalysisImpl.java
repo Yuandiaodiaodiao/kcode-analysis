@@ -21,7 +21,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         ArrayList<String>ans=manager.getAnswer1();
         manager.prepareQ2();
-        firstMinute=manager.
+        firstMinute=manager.mergeThread.firstMinute;
+        maxMinute=manager.mergeThread.maxMinute;
         t1.point();
         t1.output("read 耗时");
         System.gc();
@@ -37,6 +38,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     ByteString bs=new ByteString(128);
     ArrayList<String>NOANSWER=new ArrayList<>();
     int firstMinute;
+    int maxMinute;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
         char[]ch=Utils.getStringByteArray(time);
@@ -50,9 +52,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         M += M <= 0 ? 12 : 0;
         int day = y / 4 - y / 100 + y / 400 + 367 * M / 12 + d + y * 365 - 719499;
         int t = day * 1440 + H -480 + m - firstMinute;
-        if(t<0){
-            return NOANSWER;
-        }
+        t=(t<0||t>maxMinute)?maxMinute+1:t;
         bs.fromString(caller,responder);
         DAGPrepare.AnswerStructure ans=manager.Q2Answer.get(bs);
         if(ans!=null){

@@ -47,6 +47,7 @@ public class HashMapMergeThread extends Thread {
 
     HashMap<ByteString, RuleIpPayload> serviceMapAll;
     int firstMinute = -1;
+    int maxMinute=0;
     int solvedMinute = -1;
     RawBufferSolveThread[] threads;
     HashMap<ByteString, HashMap<Long, SingleIpPayload>>[] timeNameIpStore;
@@ -310,6 +311,7 @@ public class HashMapMergeThread extends Thread {
                     doWarning(i);
                     //进行service-service粒度的聚合
                     SolveServiceLevelSRAndP99(i);
+                    maxMinute=Math.max(maxMinute,i);
                     solvedMinute = i + 1;
                 }
                 if (bl.id == -1) {

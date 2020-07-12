@@ -93,24 +93,24 @@ public class KcodeAlertAnalysisTest {
         Map<Q2Input, Set<Q2Result>> q2Result = createQ2Result(q2ResultFilePath);
         long cast = 0L;
         for (Map.Entry<Q2Input, Set<Q2Result>> entry : q2Result.entrySet()) {
-            start = System.nanoTime();
             Q2Input q2Input = entry.getKey();
+            start = System.nanoTime();
             Collection<String> longestPaths = instance.getLongestPath(q2Input.getCaller(), q2Input.getResponder(), q2Input.getTime(), q2Input.getType());
             finish = System.nanoTime();
             Set<Q2Result> checkResult = entry.getValue();
-            System.out.println("答案长度="+checkResult.size());
-            for(Q2Result r:checkResult){
-                System.out.println(r.longestPath);
+//            System.out.println("答案长度="+checkResult.size());
+//            for(Q2Result r:checkResult){
+//                System.out.println(r.longestPath);
+//            }
+            if (Objects.isNull(longestPaths) || longestPaths.size() != checkResult.size()) {
+                System.out.println("Q2 Error Size:"  + "," + checkResult.size()+" " + longestPaths.size());
+                return;
             }
-//            if (Objects.isNull(longestPaths) || longestPaths.size() != checkResult.size()) {
-//                System.out.println("Q2 Error Size:" + q2Input + "," + checkResult.size() + longestPaths.size());
-//                return;
-//            }
-//            Set<Q2Result> results = longestPaths.stream().map(line -> new Q2Result(line)).collect(Collectors.toSet());
-//            if (!results.containsAll(checkResult)) {
-//                System.out.println("Q2 Error Result:" + q2Input);
-//                return;
-//            }
+            Set<Q2Result> results = longestPaths.stream().map(line -> new Q2Result(line)).collect(Collectors.toSet());
+            if (!results.containsAll(checkResult)) {
+                System.out.println("Q2 Error Result:" + q2Input);
+                return;
+            }
             cast += (finish - start);
         }
         System.out.println("Q2:" + (finish - start));

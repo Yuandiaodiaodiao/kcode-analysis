@@ -334,6 +334,10 @@ public class DAGPrepare {
                             int f = b1.vertexArrayList.get(j);
                             int t = b1.vertexArrayList.get(j + 1);
                             Edge e = GMatrix[f][t];
+                            if(e==null){
+                                System.out.println("e=null");
+                                continue;
+                            }
                             SRAndP99Payload payload = e.payloadArray[i];
                             if (payload != null && payload.total > 0) {
                                 srbuilder.append(DFORMAT.format(payload.rate));
