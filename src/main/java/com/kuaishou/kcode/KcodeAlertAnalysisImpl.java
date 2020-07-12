@@ -37,6 +37,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     ArrayList<String>NOANSWER=new ArrayList<>();
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
+        
         bs.fromString(caller,responder);
         DAGPrepare.AnswerStructure ans=manager.Q2Answer.get(bs);
         if(ans!=null){

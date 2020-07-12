@@ -31,9 +31,11 @@ public class Utils {
     public static String setStringByteArray(byte[] bs,int length){
         String s= "";
         char[] c=new char[length];
-        System.arraycopy(bs,0,c,0,length);
+        for(int a=0;a<length;++a){
+            c[a]=(char)bs[a];
+        }
         try {
-            stringField.set(s,bs);
+            stringField.set(s,c);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

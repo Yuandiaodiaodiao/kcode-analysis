@@ -25,6 +25,12 @@ public class DAGPrepare {
 
     //每个
     static class AnswerStructure {
+        AnswerStructure(){
+            for(int i=0;i<64;++i){
+                P99Array[i]=new ArrayList<>();
+                SRArray[i]=new ArrayList<>();
+            }
+        }
         ArrayList<ByteString> s1;
         ArrayList<ByteString> s2;
         int ansNum = 0;
@@ -302,9 +308,12 @@ public class DAGPrepare {
                             SRAndP99Payload payload = e.payloadArray[i];
                             if (payload != null && payload.total > 0) {
                                 srbuilder.append(DFORMAT.format(payload.rate));
+                                p99builder.append(payload.p99);
                             } else {
+                                p99builder.append("-1");
                                 srbuilder.append("-1%");
                             }
+                            p99builder.append("ms,");
                             srbuilder.append(',');
                         }
                         {
@@ -312,9 +321,12 @@ public class DAGPrepare {
                             SRAndP99Payload payload = e.payloadArray[i];
                             if (payload != null && payload.total > 0) {
                                 srbuilder.append(DFORMAT.format(payload.rate));
+                                p99builder.append(payload.p99);
                             } else {
+                                p99builder.append("-1");
                                 srbuilder.append("-1%");
                             }
+                            p99builder.append("ms,");
                             srbuilder.append(',');
 
                         }
@@ -325,14 +337,22 @@ public class DAGPrepare {
                             SRAndP99Payload payload = e.payloadArray[i];
                             if (payload != null && payload.total > 0) {
                                 srbuilder.append(DFORMAT.format(payload.rate));
+                                p99builder.append(payload.p99);
                             } else {
+                                p99builder.append("-1");
                                 srbuilder.append("-1%");
                             }
+                            p99builder.append("ms,");
                             srbuilder.append(',');
                         }
                         //退掉最后一个,
                         srbuilder.setLength(srbuilder.index-1);
                         ans.SRArray[i].add(srbuilder.toString());
+                        srbuilder.setLength(index1);
+
+                        p99builder.setLength(p99builder.index-1);
+                        ans.P99Array[i].add(p99builder.toString());
+                        p99builder.setLength(index2);
                     }
 
                 }

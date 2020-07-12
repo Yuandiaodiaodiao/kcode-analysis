@@ -13,6 +13,19 @@ public class FastStringBuilder {
     void setLength(int index){
         this.index=index;
     }
+    byte[] intCache=new byte[32];
+    void append(int num){
+        int m=num;
+        int i=0;
+        while(m>0){
+            intCache[i++]=(byte)(m%10+48);
+            m/=10;
+        }
+        i--;
+        while(i>=0){
+            value[index++]=intCache[i--];
+        }
+    }
     void append(char c){
         value[index++]=(byte)c;
     }
