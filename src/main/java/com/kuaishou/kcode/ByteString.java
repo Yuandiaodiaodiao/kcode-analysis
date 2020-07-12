@@ -35,7 +35,9 @@ public final class ByteString {
     ByteString(int cap){
         value=new byte[cap];
     }
+    int cmpTimes=0;
     void fromString(String s1, String s2) {
+        cmpTimes=0;
         char[] c1=Utils.getStringByteArray(s1);
         char[] c2=Utils.getStringByteArray(s2);
         length = s1.length() + s2.length();
@@ -110,13 +112,14 @@ public final class ByteString {
 
     public int hashCode() {
         int hash = 0;
-        for (int a = offset; a < length; a+=2) {
+        for (int a = offset; a < length; a+=5) {
             hash = 31 * hash + value[a];
         }
         return hash;
     }
 
     public boolean equals(Object obj) {
+        cmpTimes++;
         ByteString bs = (ByteString) obj;
         if (this.length-offset == bs.length-bs.offset && this.middle == bs.middle) {
             //倒着比较
