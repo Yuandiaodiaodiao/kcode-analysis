@@ -1,5 +1,6 @@
 package com.kuaishou.kcode;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,29 +40,52 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        }
         return ans;
     }
+    static Field stringField;
 
+    static {
+        try {
+            stringField = String.class.getDeclaredField("value");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        stringField.setAccessible(true);
+    }
+    static char[]sss;
     ByteString bs = new ByteString(128);
     ArrayList<String> NOANSWER = new ArrayList<>();
     int firstMinute;
     int maxMinute;
+    char[] ch;
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-        char[] ch = Utils.getStringByteArray(time);
-        int y = ch[0] * 1000 + ch[1] * 100 + ch[2] * 10 + ch[3] - '0' * 1111;
-        int M = ch[5] * 10 + ch[6] - '0' * 11;
-        int d = ch[8] * 10 + ch[9] - '0' * 11;
-        int H = ch[11] * 600 + ch[12] * 60 - 31680;
-        int m = ch[14] * 10 + ch[15] - '0' * 11;
-        M -= 2;
+        TimeRange tt=new TimeRange();
+//        try {
+//            ch=(char[])stringField.get(time);
+//        } catch (IllegalAccessException e) {
+//
+//        }
+//        tt.point();
+        int y = time.charAt(0) * 1000 + time.charAt(1) * 100 + time.charAt(2) * 10 + time.charAt(3) - 53328;
+        int M = time.charAt(5) * 10 + time.charAt(6) - 530;
+        int d = time.charAt(8) * 10 + time.charAt(9) - 528;
+        int H = time.charAt(11) * 600 + time.charAt(12) * 60 - 31680;
+        int m = time.charAt(14) * 10 + time.charAt(15) - 528;
         y -= M <= 0 ? 1 : 0;
         M += M <= 0 ? 12 : 0;
         int day = y / 4 - y / 100 + y / 400 + 367 * M / 12 + d + y * 365 - 719499;
         int t = day * 1440 + H - 480 + m - firstMinute;
+        tt.point();
         t = (t < 0 || t > maxMinute) ? maxMinute + 1 : t;
+        tt.point();
         bs.fromString(caller, responder);
+        tt.point();
         DAGPrepare.AnswerStructure ans = Q2Answer.get(bs);
-        return type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
+        tt.point();
+        Collection<String> an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
+        tt.point();
+        tt.outputns();
+        return an;
 
     }
 }
