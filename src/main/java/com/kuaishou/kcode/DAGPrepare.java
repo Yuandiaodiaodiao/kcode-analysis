@@ -287,7 +287,8 @@ public class DAGPrepare {
             FastStringBuilder p99builder = new FastStringBuilder((maxLength + 1) * 128 * 2);
             for (ByteStringAndVertex b1 : bav1) {
                 for (ByteStringAndVertex b2 : bav2) {
-
+                    srbuilder.setLength(0);
+                    p99builder.setLength(0);
                     srbuilder.append(b1.bs);
                     srbuilder.append("->");
                     srbuilder.append(b2.bs);
@@ -330,7 +331,7 @@ public class DAGPrepare {
                             srbuilder.append(',');
 
                         }
-                        for (int j = 0; j < b2.vertexArrayList.size() - 2; ++j) {
+                        for (int j = 0; j < b2.vertexArrayList.size() - 1; ++j) {
                             int f = b2.vertexArrayList.get(j);
                             int t = b2.vertexArrayList.get(j + 1);
                             Edge e = GMatrix[f][t];

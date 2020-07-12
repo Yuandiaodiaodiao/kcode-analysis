@@ -17,21 +17,28 @@ public class Q1Result {
 
 
     public Q1Result(String line) {
-        int i = line.lastIndexOf(",");
-        this.prefix = line.substring(0, i);
-        String valueStr = line.substring(i + 1, line.length());
-        if (valueStr.contains("ms")) {
-            DIFF = 0;
-            type = "P99";
-            this.value = Integer.valueOf(valueStr.replace("ms", ""));
-        } else if (valueStr.contains("%")) {
-            type = "SR";
-            DIFF = 5;
-            this.value = (int) (parseDouble(valueStr.replace("%", "")) * 100);
-        } else {
-            System.out.println("alert value error:" + valueStr);
-            throw new RuntimeException("alert result error");
+        try{
+
+            int i = line.lastIndexOf(",");
+            this.prefix = line.substring(0, i);
+            String valueStr = line.substring(i + 1, line.length());
+            if (valueStr.contains("ms")) {
+                DIFF = 0;
+                type = "P99";
+                this.value = Integer.valueOf(valueStr.replace("ms", ""));
+            } else if (valueStr.contains("%")) {
+                type = "SR";
+                DIFF = 5;
+                this.value = (int) (parseDouble(valueStr.replace("%", "")) * 100);
+            } else {
+                System.out.println("alert value error:" + valueStr);
+                throw new RuntimeException("alert result error");
+            }
+        }catch (NumberFormatException e){
+            System.out.println("line="+line);
+            throw e;
         }
+
     }
 
     @Override

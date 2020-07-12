@@ -35,17 +35,18 @@ public class Utils {
         return sss;
     }
     public static String setStringByteArray(byte[] bs,int length){
-        String s= "";
-        char[] c=new char[length];
-        for(int a=0;a<length;++a){
-            c[a]=(char)bs[a];
-        }
-        try {
-            stringField.set(s,c);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return s;
+        return new String(bs,0,length);
+//        String s= "";
+//        char[] c=new char[length];
+//        for(int a=0;a<length;++a){
+//            c[a]=(char)bs[a];
+//        }
+//        try {
+//            stringField.set(s,c);
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//        return s;
     }
     public static byte[] getHeapByteBufferArray(ByteBuffer b) throws IllegalAccessException {
             return (byte[]) byteBufferArrayField.get(b);

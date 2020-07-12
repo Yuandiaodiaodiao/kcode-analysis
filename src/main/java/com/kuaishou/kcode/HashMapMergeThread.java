@@ -56,7 +56,7 @@ public class HashMapMergeThread extends Thread {
     static  DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
     void checkAllIPWarning(ByteString serviceName, RuleIpPayload ruleIpPayload,int minute){
-        StringBuilder stringBuilder=new StringBuilder(200);
+        StringBuilder stringBuilder=new StringBuilder(400);
         if(ruleIpPayload.lastRefreshTime==minute&& ruleIpPayload.ipHashMap!=null && ruleIpPayload.ipHashMap.size()>0){
             //检查
             ruleIpPayload.ipHashMap.forEach((ip,srp99)->{

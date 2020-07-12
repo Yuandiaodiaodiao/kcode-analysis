@@ -5,11 +5,7 @@ import static com.kuaishou.kcode.check.demo.Utils.createQ2Result;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.kuaishou.kcode.KcodeAlertAnalysis;
@@ -22,6 +18,17 @@ import com.kuaishou.kcode.KcodeAlertAnalysisImpl;
 public class KcodeAlertAnalysisTest {
 
     public static void main(String[] args) throws Exception {
+        // demo 数据集
+//        String sourceFilePathDemo = "data/demo/demo.data";
+//        String ruleFilePathDemo = "data/demo/rule.txt";
+//        String q1ResultFilePathDemo = "data/demo/q1ans.txt";
+//        String q2ResultFilePathDemo = "data/demo/q2ans.txt";
+        // test 数据集
+        String sourceFilePathTest = "D:\\Github\\kcodedata\\data3\\kcodeAlertForStudent-test.data";
+        String ruleFilePathTest = "D:\\Github\\kcodedata\\data3\\ruleForStudent-test.txt";
+        String q1ResultFilePathTest = "D:\\Github\\kcodedata\\data3\\Q1Result-test.data";
+        String q2ResultFilePathTest = "D:\\Github\\kcodedata\\data3\\Q2Answer-test.data";
+
         // 第一套数据集
         //kcodeAlertForStudent-1.data，原始监控数据
         String sourceFilePath1 = "D:\\Github\\kcodedata\\data1\\kcodeAlertForStudent-1.data";
@@ -42,30 +49,20 @@ public class KcodeAlertAnalysisTest {
         // Q2Result-2.txt，第二问输出和结果
         String q2ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q2Result-2.txt";
 
-        String sourceFilePath3 = "D:\\Github\\kcodedata\\data3\\kcodeAlertForStudent-test.data";
-        // ruleForStudent-2，报警规则
-        String ruleFilePath3 = "D:\\Github\\kcodedata\\data3\\ruleForStudent-test.txt";
-        // Q1Result-2.txt，第一问结果
-        String q1ResultFilePath3 = "D:\\Github\\kcodedata\\data3\\Q1Result-test.data";
-        // Q2Result-2.txt，第二问输出和结果
-        String q2ResultFilePath3 = "D:\\Github\\kcodedata\\data3\\Q2Answer-test.data";
-
+//        System.out.println("--------------- demo  -----------------------");
+//        testQuestion12(sourceFilePathDemo, ruleFilePathDemo, q1ResultFilePathDemo, q2ResultFilePathDemo);
+        System.out.println("--------------- test  -----------------------");
+        testQuestion12(sourceFilePathTest, ruleFilePathTest, q1ResultFilePathTest, q2ResultFilePathTest);
+        System.out.println("--------------- data1  -----------------------");
         testQuestion12(sourceFilePath1, ruleFilePath1, q1ResultFilePath1, q2ResultFilePath1);
-
-        testQuestion12(sourceFilePath3, ruleFilePath3, q1ResultFilePath3, q2ResultFilePath3);
-
-
+        System.out.println("--------------- data2  -----------------------");
         testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
-
-
-
-
-
 
 
     }
 
     public static void testQuestion12(String sourceFilePath, String ruleFilePath, String q1ResultFilePath, String q2ResultFilePath) throws Exception {
+        int ans = 0;
         // Q1
         Set<Q1Result> q1CheckResult = createQ1CheckResult(q1ResultFilePath);
         KcodeAlertAnalysis instance = new KcodeAlertAnalysisImpl();
@@ -84,11 +81,16 @@ public class KcodeAlertAnalysisTest {
         }
 
         if (!resultSet.containsAll(q1CheckResult)) {
-            System.out.println("Q1 Error Value");
+            System.out.println("Q1 Error Value: ");
+
+            System.out.println("right: " + Arrays.toString(q1CheckResult.toArray()));
+            System.out.println("wrong: " + Arrays.toString(resultSet.toArray()));
             return;
         }
-        System.out.println("Q1:" + (finish - start));
+        double t1 = (double) ((finish - start) / 1000000) / 1000;
+        System.out.println("Q1 cast:" + t1 + "s");
 
+//        return;
         // Q2
         Map<Q2Input, Set<Q2Result>> q2Result = createQ2Result(q2ResultFilePath);
         long cast = 0L;
@@ -109,10 +111,17 @@ public class KcodeAlertAnalysisTest {
             Set<Q2Result> results = longestPaths.stream().map(line -> new Q2Result(line)).collect(Collectors.toSet());
             if (!results.containsAll(checkResult)) {
                 System.out.println("Q2 Error Result:" + q2Input);
+                System.out.println(longestPaths);
+                System.out.println(checkResult);
                 return;
             }
             cast += (finish - start);
         }
-        System.out.println("Q2:" + (finish - start));
+        int n2 = q2Result.entrySet().size();
+        double t2 = ((double) cast / 1000000);
+//        System.out.println("time use: " + ((double) KcodeAlertAnalysisImpl.tt / 1000000)+ "ms");
+
+        System.out.println("Q2 cast:" + t2 + "ms");
+        System.out.println("s2 score: " + n2 / t2);
     }
 }
