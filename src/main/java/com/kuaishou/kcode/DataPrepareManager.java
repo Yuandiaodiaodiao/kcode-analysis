@@ -58,10 +58,10 @@ public class DataPrepareManager {
             distributeBuffer.join();
             for (int i = 0; i < THREAD_NUMBER; ++i) {
                 rawBufferSolveThreadArray[i].join();
-                System.out.println("thread"+i+"join");
+//                System.out.println("thread"+i+"join");
             }
 
-            mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+5);
+            mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
 //            mergeThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();

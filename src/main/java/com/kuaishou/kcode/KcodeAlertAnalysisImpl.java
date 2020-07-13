@@ -132,7 +132,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         t2.point();
-        t2.output("Q2耗时");
+//        t2.output("Q2耗时");
         t1.point();
         t1.output("read 耗时");
         System.gc();

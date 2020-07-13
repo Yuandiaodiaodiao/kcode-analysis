@@ -42,6 +42,7 @@ public class DistributeBufferThread extends Thread{
                 ByteBuffer buf =canread.take();
                 //拷贝 并传送buf给子任务
                 if(buf.limit()==0){
+
                     canread.clear();
                     break;
                 }
