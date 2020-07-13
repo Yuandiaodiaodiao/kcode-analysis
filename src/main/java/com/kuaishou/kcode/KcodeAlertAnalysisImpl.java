@@ -94,10 +94,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         for(BufferWithLatch b:bl){
             if(b.countdown.getCount()>0){
                 sx+="m"+(b.minute-firstMinute)+"id"+(b.id);
+                break;
             }
         }
         if (DistributeBufferThread.baseMinuteTime > 0) {
-            throw new ArrayIndexOutOfBoundsException(sx );
+            throw new ArrayIndexOutOfBoundsException(sx);
         }
         if (DistributeBufferThread.baseMinuteTime > 0) {
             throw new ArrayIndexOutOfBoundsException( "耗时" + t1.firstTime()

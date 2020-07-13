@@ -252,7 +252,7 @@ public class HashMapMergeThread extends Thread {
                 }
 
                 int minute = bl.minute;
-                System.out.println("minute="+minute);
+//                System.out.println("minute="+minute);
                 for (int i = solvedMinute; i < minute - 3; ++i) {
 //                    System.out.println("正在处理"+i);
                     //合并数据
