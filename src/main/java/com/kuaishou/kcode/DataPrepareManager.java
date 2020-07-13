@@ -1,6 +1,7 @@
 package com.kuaishou.kcode;
 
 import java.nio.ByteBuffer;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -60,8 +61,10 @@ public class DataPrepareManager {
                 rawBufferSolveThreadArray[i].join();
 //                System.out.println("thread"+i+"join");
             }
-
+            TimeRange tz=new TimeRange();
             mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
+            tz.point();
+            tz.output("handleMerge");
 //            mergeThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
