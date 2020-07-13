@@ -9,47 +9,53 @@ import java.util.HashMap;
  * @author KCODE
  * Created on 2020-07-04
  */
-class FastHashString{
+class FastHashString {
     int length;
     int middle;
-    String s1,s2;
-    static long[]powArray=new long[256];
-    static{
-        powArray[0]=1;
-        for(int a=1;a<=200;++a){
-            powArray[a]=powArray[a-1]*31;
+    String s1, s2;
+    static long[] powArray = new long[256];
+
+    static {
+        powArray[0] = 1;
+        for (int a = 1; a <= 200; ++a) {
+            powArray[a] = powArray[a - 1] * 31;
         }
     }
-    FastHashString(){}
-    FastHashString(ByteString bs){
-        StringBuilder sb=new StringBuilder();
+
+    FastHashString() {
+    }
+
+    FastHashString(ByteString bs) {
+        StringBuilder sb = new StringBuilder();
         for (int a = bs.offset; a < bs.middle; ++a) {
-            sb.append((char)bs.value[a]);
+            sb.append((char) bs.value[a]);
         }
-        s1=sb.toString();
+        s1 = sb.toString();
         sb.setLength(0);
         for (int a = bs.middle; a < bs.length; ++a) {
-            sb.append((char)bs.value[a]);
+            sb.append((char) bs.value[a]);
         }
-        s2=sb.toString();
-        fromString(s1,s2);
+        s2 = sb.toString();
+        fromString(s1, s2);
     }
+
     long hashcodelong;
+
     void fromString(String s1, String s2) {
-        this.s1=s1;
-        this.s2=s2;
+        this.s1 = s1;
+        this.s2 = s2;
         middle = s1.length();
-        length=middle+s2.length();
-        hashcodelong=s1.hashCode()*powArray[length-middle]+s2.hashCode();
+        length = middle + s2.length();
+        hashcodelong = s1.hashCode() * powArray[length - middle] + s2.hashCode();
     }
 
     public int hashCode() {
-        return (int) (hashcodelong%1000000007);
+        return (int) (hashcodelong % 1000000007);
     }
 
     public boolean equals(Object obj) {
         FastHashString fs = (FastHashString) obj;
-        return this.hashcodelong==fs.hashcodelong;
+        return this.hashcodelong == fs.hashcodelong;
 //        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
     }
 
@@ -61,7 +67,9 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public KcodeAlertAnalysisImpl() {
         manager = new DataPrepareManager();
     }
-    HashMap<FastHashString,Collection<String>[]> fastHashMap;
+
+    HashMap<FastHashString, Collection<String>[]> fastHashMap;
+
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
@@ -73,23 +81,54 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         ArrayList<String> ans = manager.getAnswer1();
         TimeRange t2 = new TimeRange();
 
+        t1.point();
+        firstMinute = manager.mergeThread.firstMinute;
+
+//        try {
+//            Thread.sleep(1000*70);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        boolean dr=manager.diskRead.isAlive();
+//        boolean db=manager.distributeBuffer.isAlive();
+//        boolean mr=manager.mergeThread.isAlive();
+//
+//        int rbAlive=0;
+//        for (int i = 0; i < DataPrepareManager.THREAD_NUMBER; ++i) {
+//            if(DataPrepareManager.rawBufferSolveThreadArray[i].isAlive()){
+//                rbAlive++;
+//            }
+//        }
+//        String sx="DR"+(dr?1:0)+"DB"+(db?1:0)+"MR"+(mr?1:0)+"rb"+rbAlive;
+//        ArrayList<BufferWithLatch> bl=manager.distributeBuffer.latchArray;
+//        for(BufferWithLatch b:bl){
+//            if(b.countdown.getCount()>0){
+//                sx+="m"+(b.minute-firstMinute)+"id"+(b.id);
+//                break;
+//            }
+//        }
+//        if (DistributeBufferThread.baseMinuteTime > 0) {
+//            throw new IndexOutOfBoundsException(sx);
+//        }
+
         manager.prepareQ2();
         t2.point();
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
-        Q2Answer=manager.Q2Answer;
-        fastHashMap=new HashMap<>(4096);
+        System.out.println("time个数="+(maxMinute-firstMinute));
+        Q2Answer = manager.Q2Answer;
+        fastHashMap = new HashMap<>(4096);
+        Q2Answer.forEach((key, value) -> {
+            FastHashString newkey = new FastHashString(key);
+            int timeIndex = maxMinute - firstMinute;
 
-        Q2Answer.forEach((key,value)->{
-            FastHashString newkey=new FastHashString(key);
-            int timeIndex=maxMinute-firstMinute;
-            Collection<String>[] ansArray= new ArrayList[(timeIndex+2)*2];
-            fastHashMap.put(newkey,ansArray);
-            for(int i=0;i<timeIndex+2;++i){
-                ansArray[i]=value.P99Array[i];
+            Collection<String>[] ansArray = new ArrayList[(timeIndex + 2) * 2];
+            fastHashMap.put(newkey, ansArray);
+            for (int i = 0; i < timeIndex + 2; ++i) {
+                ansArray[i] = value.P99Array[i];
             }
-            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
-                ansArray[i]=value.SRArray[j];
+            for (int i = timeIndex + 2, j = 0; i < (timeIndex + 2) * 2; ++i, ++j) {
+                ansArray[i] = value.SRArray[j];
             }
         });
         t2.point();
@@ -111,6 +150,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        }
         return ans;
     }
+
     static Field stringField;
 
     static {
@@ -121,7 +161,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
         stringField.setAccessible(true);
     }
-    static char[]sss;
+
+    static char[] sss;
     ByteString bs = new ByteString(128);
     ArrayList<String> NOANSWER = new ArrayList<>();
     int firstMinute;
@@ -130,7 +171,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public static int timeArray[][] = new int[100][13];
 
     static {
-        for(int year=1970;year<=2020;++year){
+        for (int year = 1970; year <= 2020; ++year) {
             int y = year;
             int y2 = year;
             for (int M = 1; M <= 12; ++M) {
@@ -145,10 +186,12 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
 
     }
-    FastHashString fs=new FastHashString();
+
+    FastHashString fs = new FastHashString();
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     public static long tttt;
     public static long tttt2;
+
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
 //        try {
@@ -159,14 +202,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
         int M = time.charAt(5) * 10 + time.charAt(6) - 528;
         int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528 + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15) - firstMinute;
-        int timeIndex=maxMinute-firstMinute;
+        int timeIndex = maxMinute - firstMinute;
         t = (t < 0 || t > maxMinute) ? timeIndex + 1 : t;
-        fs.fromString(caller,responder);
+        fs.fromString(caller, responder);
 //        bs.fromString(caller, responder);
 //        System.out.println("index="+);
 //        System.out.println("pos="+pos+" "+type.charAt(0));
 
-        return fastHashMap.get(fs)[((type.charAt(0)-'P')>>1)*(timeIndex+2) +t];
+        return fastHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
 //        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
 //                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
 //        return an;

@@ -2,6 +2,7 @@ package com.kuaishou.kcode;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
@@ -29,8 +30,9 @@ public class DistributeBufferThread extends Thread{
         this.countDownQueue=countDownQueue;
     }
     static volatile int baseMinuteTime=-1;
-    static int lastMinuteTime=-1;
 
+    int lastMinuteTime=-1;
+    volatile ArrayList<BufferWithLatch> latchArray=new ArrayList<>();
     @Override
     public void run() {
         super.run();

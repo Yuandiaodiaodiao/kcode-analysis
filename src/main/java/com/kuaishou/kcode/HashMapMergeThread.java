@@ -258,22 +258,34 @@ public class HashMapMergeThread extends Thread {
         return 0;
     }
 
-    void SolveMinuteP99AndSR(int minute) {
-        HashMap<ByteString, HashMap<Long, SingleIpPayload>> thisMinute = timeNameIpStore[minute - firstMinute];
-        if (thisMinute == null) return;
-        thisMinute.forEach((key, value) -> {
-            value.forEach((key2, value2) -> {
-                SRAndP99Payload payload = new SRAndP99Payload(value2);
-                payload.p99 = solveP99(payload.bucket, payload.total);
-                payload.rate = ((double) payload.success) / payload.total;
-                //释放bucket内存
-                payload.bucket = null;
-                value.put(key2, payload);
-            });
-        });
-//        System.out.println("最大bucker="+maxBucket);
-    }
 
+    public void handleMerge(int lastMinute){
+        if (firstMinute == -1) {
+            warningList=new ArrayList<>(5000);
+            firstMinute = DistributeBufferThread.baseMinuteTime;
+            solvedMinute = firstMinute;
+            threads = DataPrepareManager.rawBufferSolveThreadArray;
+        }
+
+        if (serviceMapAll == null) {
+            serviceMapAll = new HashMap<>(256);
+        }
+
+
+        for (int i = solvedMinute; i < lastMinute - 3; ++i) {
+            //合并数据
+            mergeHashmap2(i);
+            //进行桶排 处理p99和sr
+            SolveMinuteP99AndSR2(i);
+
+            //进行报警处理
+            doWarning(i);
+            //进行service-service粒度的聚合
+            SolveServiceLevelSRAndP99(i);
+            maxMinute=Math.max(maxMinute,i);
+            solvedMinute = i + 1;
+        }
+    }
     @Override
     public void run() {
         super.run();
