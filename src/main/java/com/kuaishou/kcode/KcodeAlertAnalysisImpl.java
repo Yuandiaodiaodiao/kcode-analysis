@@ -71,7 +71,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         manager.stop();
 
         ArrayList<String> ans = manager.getAnswer1();
+        TimeRange t2 = new TimeRange();
+
         manager.prepareQ2();
+        t2.point();
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
         Q2Answer=manager.Q2Answer;
@@ -89,6 +92,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 ansArray[i]=value.SRArray[j];
             }
         });
+        t2.point();
+        t2.output("Q2耗时");
         t1.point();
         t1.output("read 耗时");
         System.gc();
