@@ -30,7 +30,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         Q2Answer=manager.Q2Answer;
         t1.point();
         t1.output("read 耗时");
-        System.gc();
+//        System.gc();
 //        String s=AnalyzeData.printMemoryInfo();
 //        Utils.getAnswer1Type(ans);
 
@@ -74,28 +74,22 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-        TimeRange tt=new TimeRange();
 //        try {
 //            ch=(char[])stringField.get(time);
 //        } catch (IllegalAccessException e) {
 //
 //        }
-        tt.point();
 
-        tt.point();
         int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
         int M = time.charAt(5) * 10 + time.charAt(6) - 528;
         int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528 + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15) - firstMinute;
         t = (t < 0 || t > maxMinute) ? maxMinute + 1 : t;
-        tt.point();
+
         bs.fromString(caller, responder);
-        tt.point();
-        DAGPrepare.AnswerStructure ans = Q2Answer.get(bs);
-        Collection<String> an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
-        tt.point();
-        tt.outputns();
-        System.out.println("比较"+bs.cmpTimes);
-        return an;
+
+        return Q2Answer.get(bs).ansArray[type.charAt(0)-'P'][t];
+//                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
+//        return an;
 
     }
 }
