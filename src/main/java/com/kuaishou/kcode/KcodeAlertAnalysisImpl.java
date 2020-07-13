@@ -56,6 +56,21 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     int firstMinute;
     int maxMinute;
     char[] ch;
+    public static int timeArray[][] = new int[100][13];
+
+    static {
+        int y = 2020;
+        int y2 = 2020;
+        for (int M = 1; M <= 12; ++M) {
+            int y3 = y;
+            int m2 = M;
+            m2 -= 2;
+            y3 -= m2 <= 0 ? 1 : 0;
+            m2 += m2 <= 0 ? 12 : 0;
+            int day = y3 / 4 - y3 / 100 + y3 / 400 + 367 * m2 / 12 + y3 * 365 - 719499;
+            timeArray[2020 - y2][M] = day * 24 * 60 - 480;
+        }
+    }
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
@@ -66,19 +81,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //
 //        }
         tt.point();
-        time.charAt(0);
-        caller.charAt(0);
-        caller.charAt(0);
+
         tt.point();
-        int y = time.charAt(0) * 1000 + time.charAt(1) * 100 + time.charAt(2) * 10 + time.charAt(3) - 53328;
-        int M = time.charAt(5) * 10 + time.charAt(6) - 530;
-        int d = time.charAt(8) * 10 + time.charAt(9) - 528;
-        int H = time.charAt(11) * 600 + time.charAt(12) * 60 - 31680;
-        int m = time.charAt(14) * 10 + time.charAt(15) - 528;
-        y -= M <= 0 ? 1 : 0;
-        M += M <= 0 ? 12 : 0;
-        int day = y / 4 - y / 100 + y / 400 + 367 * M / 12 + d + y * 365 - 719499;
-        int t = day * 1440 + H - 480 + m - firstMinute;
+        int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
+        int M = time.charAt(5) * 10 + time.charAt(6) - 528;
+        int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528 + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15) - firstMinute;
         t = (t < 0 || t > maxMinute) ? maxMinute + 1 : t;
         tt.point();
         bs.fromString(caller, responder);
