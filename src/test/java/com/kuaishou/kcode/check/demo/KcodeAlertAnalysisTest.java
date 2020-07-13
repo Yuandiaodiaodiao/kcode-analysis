@@ -100,6 +100,7 @@ public class KcodeAlertAnalysisTest {
             start = System.nanoTime();
             Collection<String> longestPaths = instance.getLongestPath(q2Input.getCaller(), q2Input.getResponder(), q2Input.getTime(), q2Input.getType());
             finish = System.nanoTime();
+
             Set<Q2Result> checkResult = entry.getValue();
 //            System.out.println("答案长度="+checkResult.size());
 //            for(Q2Result r:checkResult){

@@ -20,8 +20,24 @@ class FastHashString{
             powArray[a]=powArray[a-1]*31;
         }
     }
+    FastHashString(){}
+    FastHashString(ByteString bs){
+        StringBuilder sb=new StringBuilder();
+        for (int a = bs.offset; a < bs.middle; ++a) {
+            sb.append((char)bs.value[a]);
+        }
+        s1=sb.toString();
+        sb.setLength(0);
+        for (int a = bs.middle; a < bs.length; ++a) {
+            sb.append((char)bs.value[a]);
+        }
+        s2=sb.toString();
+        fromString(s1,s2);
+    }
     long hashcodelong;
     void fromString(String s1, String s2) {
+        this.s1=s1;
+        this.s2=s2;
         middle = s1.length();
         length=middle+s2.length();
         hashcodelong=s1.hashCode()*powArray[length-middle]+s2.hashCode();
@@ -33,7 +49,8 @@ class FastHashString{
 
     public boolean equals(Object obj) {
         FastHashString fs = (FastHashString) obj;
-        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
+        return this.hashcodelong==fs.hashcodelong;
+//        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
     }
 
 }
@@ -44,9 +61,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public KcodeAlertAnalysisImpl() {
         manager = new DataPrepareManager();
     }
-    []
+    HashMap<FastHashString,Collection<String>[]> fastHashMap;
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
+        System.gc();
 
         TimeRange t1 = new TimeRange();
         manager.start(path, alertRules);
@@ -57,9 +75,28 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
         Q2Answer=manager.Q2Answer;
+        fastHashMap=new HashMap<>(4096);
+
+        Q2Answer.forEach((key,value)->{
+            FastHashString newkey=new FastHashString(key);
+            int timeIndex=maxMinute-firstMinute;
+            Collection<String>[] ansArray= new ArrayList[(timeIndex+2)*2];
+            fastHashMap.put(newkey,ansArray);
+            for(int i=0;i<timeIndex+2;++i){
+                ansArray[i]=value.P99Array[i];
+            }
+            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
+                ansArray[i]=value.SRArray[j];
+            }
+        });
         t1.point();
         t1.output("read 耗时");
-//        System.gc();
+        System.gc();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 //        String s=AnalyzeData.printMemoryInfo();
 //        Utils.getAnswer1Type(ans);
 
@@ -88,18 +125,22 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public static int timeArray[][] = new int[100][13];
 
     static {
-        int y = 2020;
-        int y2 = 2020;
-        for (int M = 1; M <= 12; ++M) {
-            int y3 = y;
-            int m2 = M;
-            m2 -= 2;
-            y3 -= m2 <= 0 ? 1 : 0;
-            m2 += m2 <= 0 ? 12 : 0;
-            int day = y3 / 4 - y3 / 100 + y3 / 400 + 367 * m2 / 12 + y3 * 365 - 719499;
-            timeArray[2020 - y2][M] = day * 24 * 60 - 480;
+        for(int year=1970;year<=2020;++year){
+            int y = year;
+            int y2 = year;
+            for (int M = 1; M <= 12; ++M) {
+                int y3 = y;
+                int m2 = M;
+                m2 -= 2;
+                y3 -= m2 <= 0 ? 1 : 0;
+                m2 += m2 <= 0 ? 12 : 0;
+                int day = y3 / 4 - y3 / 100 + y3 / 400 + 367 * m2 / 12 + y3 * 365 - 719499;
+                timeArray[2020 - y2][M] = day * 24 * 60 - 480;
+            }
         }
+
     }
+    FastHashString fs=new FastHashString();
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
@@ -112,11 +153,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
         int M = time.charAt(5) * 10 + time.charAt(6) - 528;
         int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528 + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15) - firstMinute;
-        t = (t < 0 || t > maxMinute) ? maxMinute + 1 : t;
-
-        bs.fromString(caller, responder);
-
-        return Q2Answer.get(bs).ansArray[type.charAt(0)-'P'][t];
+        int timeIndex=maxMinute-firstMinute;
+        t = (t < 0 || t > maxMinute) ? timeIndex + 1 : t;
+        fs.fromString(caller,responder);
+//        bs.fromString(caller, responder);
+//        System.out.println("index="+);
+//        System.out.println("pos="+pos+" "+type.charAt(0));
+        return fastHashMap.get(fs)[((type.charAt(0)-'P')>>1)*(timeIndex+2) +t];
+//        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
 //                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
 //        return an;
 

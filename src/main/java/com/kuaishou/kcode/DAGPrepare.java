@@ -126,7 +126,7 @@ public class DAGPrepare {
             vertexArray.get(from).TinDegree++;
             GT[to].add(new Edge(to, from, value.serviceLevelPayload));
         });
-        System.out.println("入度总数=" + allIn);
+//        System.out.println("入度总数=" + allIn);
     }
 
     static class point {

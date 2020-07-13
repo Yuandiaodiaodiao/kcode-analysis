@@ -280,7 +280,9 @@ public class HashMapMergeThread extends Thread {
             try {
                 BufferWithLatch bl = bufferQueue.take();
                 //等待这个buffer处理完毕
-                bl.countdown.await();
+                if(bl.id!=-1){
+                    bl.countdown.await();
+                }
                 if (firstMinute == -1) {
                     warningList=new ArrayList<>(5000);
                     firstMinute = DistributeBufferThread.baseMinuteTime;

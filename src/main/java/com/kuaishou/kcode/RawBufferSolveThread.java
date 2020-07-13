@@ -28,7 +28,6 @@ public class RawBufferSolveThread extends Thread {
                 BufferWithLatch bl=unsolvedBuffer.take();
                 if(bl.id==-1){
                     //结束了
-                    bl.countdown.countDown();
                     unsolvedBuffer.offer(bl);
                     break;
                 }
