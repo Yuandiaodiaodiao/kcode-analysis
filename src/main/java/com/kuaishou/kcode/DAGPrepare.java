@@ -300,7 +300,7 @@ public class DAGPrepare {
                     int index2 = p99builder.index;
                     //处理minute SR
 
-                    for (int i = 0; i < 32; ++i) {
+                    for (int i = 0; i < 64; ++i) {
                         for (int j = b1.vertexArrayList.size() - 1; j >= 1; --j) {
                             int f = b1.vertexArrayList.get(j);
                             int t = b1.vertexArrayList.get(j - 1);

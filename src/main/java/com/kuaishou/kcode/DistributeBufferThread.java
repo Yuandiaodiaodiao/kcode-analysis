@@ -30,7 +30,8 @@ public class DistributeBufferThread extends Thread{
         this.countDownQueue=countDownQueue;
     }
     static volatile int baseMinuteTime=-1;
-    static int lastMinuteTime=-1;
+
+    int lastMinuteTime=-1;
     volatile ArrayList<BufferWithLatch> latchArray=new ArrayList<>();
     @Override
     public void run() {

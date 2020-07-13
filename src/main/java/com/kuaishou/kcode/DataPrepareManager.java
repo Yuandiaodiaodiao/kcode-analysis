@@ -12,13 +12,12 @@ public class DataPrepareManager {
     DistributeBufferThread distributeBuffer;
     HashMapMergeThread mergeThread;
     static RawBufferSolveThread[] rawBufferSolveThreadArray = new RawBufferSolveThread[16];
-    static int THREAD_NUMBER = 1;
+    static int THREAD_NUMBER = 4;
     static ArrayBlockingQueue<ByteBuffer> canuse = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<ByteBuffer> canread = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(64);
     static ArrayBlockingQueue<ByteBuffer> solvedBuffer = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<BufferWithLatch> coutdownQueue = new ArrayBlockingQueue<>(256);
-    TimeRange timeRange=new TimeRange();
     DataPrepareManager() {
         unsolvedBuffer.clear();
         coutdownQueue.clear();
@@ -50,14 +49,20 @@ public class DataPrepareManager {
         AlertRulesPrepare.RuleMaps rm = AlertRulesPrepare.prepare3HashMap(ruleArray);
         //rules处理好之后在merge每分钟之后进行报警处理
         mergeThread.setRuleMaps(rm);
-        mergeThread.start();
+//        mergeThread.start();
     }
 
     public void stop() {
         try {
             diskRead.join();
             distributeBuffer.join();
-            mergeThread.join();
+            for (int i = 0; i < THREAD_NUMBER; ++i) {
+                rawBufferSolveThreadArray[i].join();
+//                System.out.println("thread"+i+"join");
+            }
+
+            mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
+//            mergeThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

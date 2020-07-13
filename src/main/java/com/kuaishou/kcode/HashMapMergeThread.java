@@ -229,7 +229,33 @@ public class HashMapMergeThread extends Thread {
     }
 
 
+    public void handleMerge(int lastMinute){
+        if (firstMinute == -1) {
+            warningList=new ArrayList<>(5000);
+            firstMinute = DistributeBufferThread.baseMinuteTime;
+            solvedMinute = firstMinute;
+            threads = DataPrepareManager.rawBufferSolveThreadArray;
+        }
 
+        if (serviceMapAll == null) {
+            serviceMapAll = new HashMap<>(256);
+        }
+
+
+        for (int i = solvedMinute; i < lastMinute - 3; ++i) {
+            //合并数据
+            mergeHashmap2(i);
+            //进行桶排 处理p99和sr
+            SolveMinuteP99AndSR2(i);
+
+            //进行报警处理
+            doWarning(i);
+            //进行service-service粒度的聚合
+            SolveServiceLevelSRAndP99(i);
+            maxMinute=Math.max(maxMinute,i);
+            solvedMinute = i + 1;
+        }
+    }
     @Override
     public void run() {
         super.run();

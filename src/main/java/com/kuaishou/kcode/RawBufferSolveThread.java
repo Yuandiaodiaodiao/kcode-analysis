@@ -36,7 +36,7 @@ public class RawBufferSolveThread extends Thread {
                 if (timeNameIpStore == null) {
                     //初始化线程独有的数据结构 [time][name][ip]
                     timeNameIpStore = new HashMap[64];
-                    for (int a = 0; a < 32; ++a) {
+                    for (int a = 0; a < 64; ++a) {
                         timeNameIpStore[a] = new HashMap<>(128);
                     }
                 }
@@ -45,7 +45,7 @@ public class RawBufferSolveThread extends Thread {
                 }
                 solveLine(buffer);
                 //处理完之后 触发处理ok
-                countdown.countDown();
+//                countdown.countDown();
                 if (buffer.get(buffer.limit() - 1) == '\n') {
 //                        System.out.println("正常");
                 } else {
