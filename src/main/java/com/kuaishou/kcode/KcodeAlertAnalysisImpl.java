@@ -74,7 +74,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         TimeRange t2 = new TimeRange();
         t1.point();
         try {
-            Thread.sleep(1000*20);
+            Thread.sleep(1000*70);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
