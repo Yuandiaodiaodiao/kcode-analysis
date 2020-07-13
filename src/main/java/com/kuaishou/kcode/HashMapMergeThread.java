@@ -180,6 +180,10 @@ public class HashMapMergeThread extends Thread {
             RawBufferSolveThread t = DataPrepareManager.rawBufferSolveThreadArray[a];
             if (t.timeNameIpStore == null) continue;
             int timeIndex = minute - firstMinute;
+            if(timeIndex>DataPrepareManager.MAXTIME){
+                throw new ArrayIndexOutOfBoundsException("t="+timeIndex);
+            }
+
             HashMap<ByteString, HashMap<Long, SingleIpPayload>> serviceMap = t.timeNameIpStore[timeIndex];
             if (serviceMap == null) continue;
 
