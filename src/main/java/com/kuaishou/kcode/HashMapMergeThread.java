@@ -28,7 +28,7 @@ public class HashMapMergeThread extends Thread {
 
     static class RuleStatePayload {
         RuleStatePayload(SingleIpPayload payload, int timeIndex) {
-            this.payload = new SRAndP99Payload[64];
+            this.payload = new SRAndP99Payload[DataPrepareManager.MAXTIME];
         }
 
         SRAndP99Payload[] payload;
@@ -39,7 +39,7 @@ public class HashMapMergeThread extends Thread {
         RuleIpPayload() {
             this.ipHashMap = new HashMap<>();
         }
-        SRAndP99Payload[] serviceLevelPayload=new SRAndP99Payload[64];
+        SRAndP99Payload[] serviceLevelPayload=new SRAndP99Payload[DataPrepareManager.MAXTIME];
         int lastRefreshTime=-1;
         int checked=0;
         ArrayList<AlertRulesPrepare.Rule> rules;

@@ -22,19 +22,18 @@ public class DAGPrepare {
 
     //每个
     static class AnswerStructure {
-        Collection<String>[][]ansArray=new Collection[4][];
+
         AnswerStructure(){
-            for(int i=0;i<64;++i){
+            for(int i=0;i<DataPrepareManager.MAXTIME;++i){
                 P99Array[i]=new ArrayList<>();
                 SRArray[i]=new ArrayList<>();
             }
 
-            ansArray[0]=P99Array;
-            ansArray[3]=SRArray;
+
         }
 
-        Collection<String>[] P99Array = new ArrayList[64];
-        Collection<String>[] SRArray = new ArrayList[64];
+        Collection<String>[] P99Array = new ArrayList[DataPrepareManager.MAXTIME];
+        Collection<String>[] SRArray = new ArrayList[DataPrepareManager.MAXTIME];
     }
 
     /**
@@ -300,7 +299,7 @@ public class DAGPrepare {
                     int index2 = p99builder.index;
                     //处理minute SR
 
-                    for (int i = 0; i < 64; ++i) {
+                    for (int i = 0; i < DataPrepareManager.MAXTIME; ++i) {
                         for (int j = b1.vertexArrayList.size() - 1; j >= 1; --j) {
                             int f = b1.vertexArrayList.get(j);
                             int t = b1.vertexArrayList.get(j - 1);
