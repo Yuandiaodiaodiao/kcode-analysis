@@ -18,6 +18,7 @@ public class DataPrepareManager {
     static ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(64);
     static ArrayBlockingQueue<ByteBuffer> solvedBuffer = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<BufferWithLatch> coutdownQueue = new ArrayBlockingQueue<>(256);
+    TimeRange timeRange=new TimeRange();
     DataPrepareManager() {
         unsolvedBuffer.clear();
         coutdownQueue.clear();

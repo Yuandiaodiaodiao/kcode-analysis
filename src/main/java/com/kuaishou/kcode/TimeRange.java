@@ -8,6 +8,7 @@ public class TimeRange {
     TimeRange(){
         timeArray.add(System.nanoTime());
     }
+    public synchronized void pointsync(){timeArray.add(System.nanoTime());}
     public void point(){
         timeArray.add(System.nanoTime());
     }

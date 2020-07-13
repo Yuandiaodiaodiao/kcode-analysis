@@ -212,37 +212,7 @@ public class HashMapMergeThread extends Thread {
         }
     }
 
-    void mergeHashmap(int minute) {
-        for (int a = 0; a < DataPrepareManager.THREAD_NUMBER; ++a) {
-            RawBufferSolveThread t = DataPrepareManager.rawBufferSolveThreadArray[a];
-            if (t.timeNameIpStore == null) continue;
-            HashMap<ByteString, HashMap<Long, SingleIpPayload>> serviceMap = t.timeNameIpStore[minute - firstMinute];
-            if (serviceMap == null) continue;
-            HashMap<ByteString, HashMap<Long, SingleIpPayload>> thisMinute = timeNameIpStore[minute - firstMinute];
-            serviceMap.forEach((key, value) -> {
-                thisMinute.merge(key, value, (oldValue, newValue) -> {
-                    //合并ip集合
-                    newValue.forEach((key2, value2) -> {
-                        oldValue.merge(key2, value2, (oldValue2, newValue2) -> {
-                            oldValue2.success += newValue2.success;
-                            oldValue2.total += newValue2.total;
-                            for (int i = 0; i < newValue2.bucket.length; ++i) {
-                                oldValue2.bucket[i] += newValue2.bucket[i];
-                            }
-                            newValue2.bucket = null;
-                            return oldValue2;
-                        });
-                    });
-                    return oldValue;
-                });
-            });
-            //合并好了就可以释放内存
-            t.timeNameIpStore[minute - firstMinute] = null;
 
-        }
-    }
-
-    static int maxBucket = 0;
 
     static int solveP99(int[] bucket, int allNum) {
         double i = 0.99 * allNum;
@@ -258,21 +228,7 @@ public class HashMapMergeThread extends Thread {
         return 0;
     }
 
-    void SolveMinuteP99AndSR(int minute) {
-        HashMap<ByteString, HashMap<Long, SingleIpPayload>> thisMinute = timeNameIpStore[minute - firstMinute];
-        if (thisMinute == null) return;
-        thisMinute.forEach((key, value) -> {
-            value.forEach((key2, value2) -> {
-                SRAndP99Payload payload = new SRAndP99Payload(value2);
-                payload.p99 = solveP99(payload.bucket, payload.total);
-                payload.rate = ((double) payload.success) / payload.total;
-                //释放bucket内存
-                payload.bucket = null;
-                value.put(key2, payload);
-            });
-        });
-//        System.out.println("最大bucker="+maxBucket);
-    }
+
 
     @Override
     public void run() {
@@ -290,19 +246,13 @@ public class HashMapMergeThread extends Thread {
                     solvedMinute = firstMinute;
                     threads = DataPrepareManager.rawBufferSolveThreadArray;
                 }
-                if (timeNameIpStore == null) {
-                    //初始化线程独有的数据结构 [time][name][ip]
-//                    timeNameIpStore = new HashMap[64];
-//                    for (int a = 0; a < 32; ++a) {
-//                        timeNameIpStore[a] = new HashMap<>(128);
-//                    }
-                }
+
                 if (serviceMapAll == null) {
                     serviceMapAll = new HashMap<>(256);
                 }
 
                 int minute = bl.minute;
-
+                System.out.println("minute="+minute);
                 for (int i = solvedMinute; i < minute - 3; ++i) {
 //                    System.out.println("正在处理"+i);
                     //合并数据

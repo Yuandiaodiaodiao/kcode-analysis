@@ -68,18 +68,44 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         TimeRange t1 = new TimeRange();
         manager.start(path, alertRules);
-        manager.stop();
+//        manager.stop();
 
         ArrayList<String> ans = manager.getAnswer1();
         TimeRange t2 = new TimeRange();
         t1.point();
+        try {
+            Thread.sleep(1000*20);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean dr=manager.diskRead.isAlive();
+        boolean db=manager.distributeBuffer.isAlive();
+        boolean mr=manager.mergeThread.isAlive();
+        firstMinute = manager.mergeThread.firstMinute;
 
+        int rbAlive=0;
+        for (int i = 0; i < DataPrepareManager.THREAD_NUMBER; ++i) {
+            if(DataPrepareManager.rawBufferSolveThreadArray[i].isAlive()){
+                rbAlive++;
+            }
+        }
+        String sx="DR"+(dr?1:0)+"DB"+(db?1:0)+"MR"+(mr?1:0)+"rb"+rbAlive;
+        ArrayList<BufferWithLatch> bl=manager.distributeBuffer.latchArray;
+        for(BufferWithLatch b:bl){
+            if(b.countdown.getCount()>0){
+                sx+="m"+(b.minute-firstMinute)+"id"+(b.id);
+            }
+        }
         if (DistributeBufferThread.baseMinuteTime > 0) {
-            throw new ArrayIndexOutOfBoundsException( "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size());
+            throw new ArrayIndexOutOfBoundsException(sx );
+        }
+        if (DistributeBufferThread.baseMinuteTime > 0) {
+            throw new ArrayIndexOutOfBoundsException( "耗时" + t1.firstTime()
+                    + "R=" + alertRules.size() + "K="
+                    + manager.getServicePairNum() + "A=" + ans.size());
         }
         manager.prepareQ2();
         t2.point();
-        firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
         Q2Answer=manager.Q2Answer;
         fastHashMap=new HashMap<>(4096);

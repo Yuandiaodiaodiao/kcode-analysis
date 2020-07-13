@@ -2,6 +2,7 @@ package com.kuaishou.kcode;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
@@ -30,7 +31,7 @@ public class DistributeBufferThread extends Thread{
     }
     static volatile int baseMinuteTime=-1;
     static int lastMinuteTime=-1;
-
+    volatile ArrayList<BufferWithLatch> latchArray=new ArrayList<>();
     @Override
     public void run() {
         super.run();
@@ -72,13 +73,16 @@ public class DistributeBufferThread extends Thread{
 
                 CountDownLatch countdown=new CountDownLatch(1);
                 countDownQueue.offer(new BufferWithLatch(countdown,bufferId,thisMinuteTime));
+
+                latchArray.add(new BufferWithLatch(countdown,bufferId,thisMinuteTime));
                 //将含有数据的buffer扔给任务队列
                 unsolvedBuffer.offer(new BufferWithLatch(bufOutput,countdown,bufferId));
                 bufferId++;
             }
             //要让每个线程都coutdown一下
-            CountDownLatch countdown=new CountDownLatch(DataPrepareManager.THREAD_NUMBER);
+            CountDownLatch countdown=new CountDownLatch(1);
             countDownQueue.offer(new BufferWithLatch(countdown,-1,lastMinuteTime+6));
+            latchArray.add(new BufferWithLatch(countdown,-1,lastMinuteTime+6));
             //通过id==-1结束rawbaffer处理线程
             unsolvedBuffer.offer(new BufferWithLatch(countdown,-1,-1));
 
