@@ -186,13 +186,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
 
     }
-    static char[]sss;
-    ByteString bs = new ByteString(128);
-    ArrayList<String> NOANSWER = new ArrayList<>();
-    int firstMinute;
-    int maxMinute;
-    char[] ch;
-    public static int timeArray[][] = new int[100][13];
+
 
     FastHashString fs = new FastHashString();
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
