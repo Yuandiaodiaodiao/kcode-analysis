@@ -1,10 +1,7 @@
 package com.kuaishou.kcode;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -25,17 +22,19 @@ public class DAGPrepare {
 
     //每个
     static class AnswerStructure {
+        Collection<String>[][]ansArray=new Collection[4][];
         AnswerStructure(){
             for(int i=0;i<64;++i){
                 P99Array[i]=new ArrayList<>();
                 SRArray[i]=new ArrayList<>();
             }
+
+            ansArray[0]=P99Array;
+            ansArray[3]=SRArray;
         }
-        ArrayList<ByteString> s1;
-        ArrayList<ByteString> s2;
-        int ansNum = 0;
-        ArrayList<String>[] P99Array = new ArrayList[64];
-        ArrayList<String>[] SRArray = new ArrayList[64];
+
+        Collection<String>[] P99Array = new ArrayList[64];
+        Collection<String>[] SRArray = new ArrayList[64];
     }
 
     /**
@@ -127,7 +126,7 @@ public class DAGPrepare {
             vertexArray.get(from).TinDegree++;
             GT[to].add(new Edge(to, from, value.serviceLevelPayload));
         });
-        System.out.println("入度总数=" + allIn);
+//        System.out.println("入度总数=" + allIn);
     }
 
     static class point {
@@ -275,7 +274,7 @@ public class DAGPrepare {
     static DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
     void generateAnswer() {
-        Q2Answer = new HashMap<>(4096*4);
+        Q2Answer = new HashMap<>(4096);
         serviceMapAll.forEach((key, value) -> {
             Vertex from = vertexMap.get(key.first());
             Vertex to = vertexMap.get(key.second());
@@ -287,7 +286,8 @@ public class DAGPrepare {
             FastStringBuilder p99builder = new FastStringBuilder((maxLength + 1) * 128 * 2);
             for (ByteStringAndVertex b1 : bav1) {
                 for (ByteStringAndVertex b2 : bav2) {
-
+                    srbuilder.setLength(0);
+                    p99builder.setLength(0);
                     srbuilder.append(b1.bs);
                     srbuilder.append("->");
                     srbuilder.append(b2.bs);
@@ -330,7 +330,7 @@ public class DAGPrepare {
                             srbuilder.append(',');
 
                         }
-                        for (int j = 0; j < b2.vertexArrayList.size() - 2; ++j) {
+                        for (int j = 0; j < b2.vertexArrayList.size() - 1; ++j) {
                             int f = b2.vertexArrayList.get(j);
                             int t = b2.vertexArrayList.get(j + 1);
                             Edge e = GMatrix[f][t];

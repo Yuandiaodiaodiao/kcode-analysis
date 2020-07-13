@@ -17,6 +17,12 @@ public class TimeRange {
         }
         System.out.println();
     }
+    public void outputns(){
+        for(int i=1;i<timeArray.size();++i){
+            System.out.print(" "+Math.round((timeArray.get(i)-timeArray.get(i-1))));
+        }
+        System.out.println();
+    }
     public void output(){
         for(int i=1;i<timeArray.size();++i){
             System.out.print(" "+Math.round((timeArray.get(i)-timeArray.get(i-1))*1.0/1000000));

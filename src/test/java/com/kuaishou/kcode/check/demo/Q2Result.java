@@ -8,7 +8,7 @@ import java.util.Objects;
  * Created on 2020-07-04
  */
 public class Q2Result {
-    private String longestPath;
+    public String longestPath;
 
     private LinkedList<Q2ResultValue> values;
 

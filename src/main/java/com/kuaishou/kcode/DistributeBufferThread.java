@@ -13,12 +13,13 @@ public class DistributeBufferThread extends Thread{
     private ArrayBlockingQueue<BufferWithLatch> countDownQueue;
     private static final int CHUNCK_SIZE = DataPrepareManager.DIRECT_CHUNK_SIZE;
     private int readTimes;
-    private int lastBufferNumbers;
+    private static int lastBufferNumbers=DataPrepareManager.THREAD_NUMBER+1;
     DistributeBufferThread(){
+        baseMinuteTime=-1;
+        lastMinuteTime=-1;
     }
     public void setReadTimes(int readTimes){
         this.readTimes=readTimes;
-        lastBufferNumbers=DataPrepareManager.THREAD_NUMBER+1;
     }
     public void LinkDirectBufferBlockingQueue(ArrayBlockingQueue<ByteBuffer> canuse,ArrayBlockingQueue<ByteBuffer> canread){
         this.canuse=canuse;
@@ -33,6 +34,7 @@ public class DistributeBufferThread extends Thread{
     }
     static volatile int baseMinuteTime=-1;
     static int lastMinuteTime=-1;
+
     @Override
     public void run() {
         super.run();

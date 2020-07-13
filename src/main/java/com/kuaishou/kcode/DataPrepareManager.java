@@ -13,16 +13,18 @@ public class DataPrepareManager {
     HashMapMergeThread mergeThread;
     static RawBufferSolveThread[] rawBufferSolveThreadArray = new RawBufferSolveThread[16];
     static int THREAD_NUMBER = 4;
-
+    static ArrayBlockingQueue<ByteBuffer> canuse = new ArrayBlockingQueue<ByteBuffer>(64);
+    static ArrayBlockingQueue<ByteBuffer> canread = new ArrayBlockingQueue<ByteBuffer>(64);
+    static ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(64);
+    static ArrayBlockingQueue<ByteBuffer> solvedBuffer = new ArrayBlockingQueue<ByteBuffer>(64);
+    static ArrayBlockingQueue<BufferWithLatch> coutdownQueue = new ArrayBlockingQueue<>(256);
     DataPrepareManager() {
+        unsolvedBuffer.clear();
+        coutdownQueue.clear();
         diskRead = new DiskReadThread();
         distributeBuffer = new DistributeBufferThread();
         mergeThread = new HashMapMergeThread();
-        ArrayBlockingQueue<ByteBuffer> canuse = new ArrayBlockingQueue<ByteBuffer>(8);
-        ArrayBlockingQueue<ByteBuffer> canread = new ArrayBlockingQueue<ByteBuffer>(8);
-        ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(16);
-        ArrayBlockingQueue<ByteBuffer> solvedBuffer = new ArrayBlockingQueue<ByteBuffer>(16);
-        ArrayBlockingQueue<BufferWithLatch> coutdownQueue = new ArrayBlockingQueue<>(128);
+
         distributeBuffer.LinkCountDownBuffer(coutdownQueue);
         mergeThread.LinkCountDownBuffer(coutdownQueue);
         diskRead.LinkBlockingQueue(canuse, canread);
