@@ -147,6 +147,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
     FastHashString fs=new FastHashString();
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
+    public static long tttt;
+    public static long tttt2;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
 //        try {
@@ -154,7 +156,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        } catch (IllegalAccessException e) {
 //
 //        }
-
+        tttt2=System.nanoTime();
         int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
         int M = time.charAt(5) * 10 + time.charAt(6) - 528;
         int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528 + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15) - firstMinute;
@@ -164,7 +166,9 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        bs.fromString(caller, responder);
 //        System.out.println("index="+);
 //        System.out.println("pos="+pos+" "+type.charAt(0));
-        return fastHashMap.get(fs)[((type.charAt(0)-'P')>>1)*(timeIndex+2) +t];
+        Collection<String> cs=fastHashMap.get(fs)[((type.charAt(0)-'P')>>1)*(timeIndex+2) +t];
+        tttt=System.nanoTime();
+        return cs;
 //        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
 //                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
 //        return an;
