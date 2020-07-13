@@ -10,45 +10,30 @@ import java.util.HashMap;
  * Created on 2020-07-04
  */
 class FastHashString{
-    byte[] value;
     int length;
     int middle;
     String s1,s2;
+    static long[]powArray=new long[256];
+    static{
+        powArray[0]=1;
+        for(int a=1;a<=200;++a){
+            powArray[a]=powArray[a-1]*31;
+        }
+    }
+    long hashcodelong;
     void fromString(String s1, String s2) {
-        char[] c1=Utils.getStringByteArray(s1);
-        char[] c2=Utils.getStringByteArray(s2);
-        length = s1.length() + s2.length();
         middle = s1.length();
-        for (int i = 0; i < middle; ++i) {
-            value[i] = (byte) c1[i];
-        }
-        for (int i = middle; i < length; ++i) {
-            value[i] = (byte) c2[i - middle];
-        }
+        length=middle+s2.length();
+        hashcodelong=s1.hashCode()*powArray[length-middle]+s2.hashCode();
     }
 
     public int hashCode() {
-        int hash = 0;
-        for (int a = offset; a < length; a+=5) {
-            hash = 31 * hash + value[a];
-        }
-        return hash;
+        return (int) (hashcodelong%1000000007);
     }
 
     public boolean equals(Object obj) {
-        ByteString bs = (ByteString) obj;
-        if (this.length-offset == bs.length-bs.offset && this.middle == bs.middle) {
-            //倒着比较
-            for (int i = length-1,j=bs.length-1; i >= offset; --i,--j) {
-                if (value[i] != bs.value[j]) {
-                    return false;
-                }
-            }
-
-
-            return true;
-        }
-        return false;
+        FastHashString fs = (FastHashString) obj;
+        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
     }
 
 }
@@ -59,7 +44,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public KcodeAlertAnalysisImpl() {
         manager = new DataPrepareManager();
     }
-
+    []
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
 
