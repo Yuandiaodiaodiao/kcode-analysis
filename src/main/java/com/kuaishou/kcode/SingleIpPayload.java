@@ -6,5 +6,5 @@ public class SingleIpPayload {
     //总调用次数
     int total=0;
     //用于桶排序的桶
-    int[] bucket=new int[300];
+    int[] bucket=new int[500];
 }

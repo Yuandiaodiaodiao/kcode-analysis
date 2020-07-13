@@ -19,10 +19,10 @@ public class KcodeAlertAnalysisTest {
 
     public static void main(String[] args) throws Exception {
         // demo 数据集
-//        String sourceFilePathDemo = "data/demo/demo.data";
-//        String ruleFilePathDemo = "data/demo/rule.txt";
-//        String q1ResultFilePathDemo = "data/demo/q1ans.txt";
-//        String q2ResultFilePathDemo = "data/demo/q2ans.txt";
+        String sourceFilePathDemo = "D:\\Github\\kcodedata\\demo\\demo.data";
+        String ruleFilePathDemo = "D:\\Github\\kcodedata\\demo\\rule.txt";
+        String q1ResultFilePathDemo = "D:\\Github\\kcodedata\\demo\\q1ans.txt";
+        String q2ResultFilePathDemo = "D:\\Github\\kcodedata\\demo\\q2ans.txt";
         // test 数据集
         String sourceFilePathTest = "D:\\Github\\kcodedata\\data3\\kcodeAlertForStudent-test.data";
         String ruleFilePathTest = "D:\\Github\\kcodedata\\data3\\ruleForStudent-test.txt";
@@ -49,16 +49,16 @@ public class KcodeAlertAnalysisTest {
         // Q2Result-2.txt，第二问输出和结果
         String q2ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q2Result-2.txt";
 
-//        System.out.println("--------------- demo  -----------------------");
-//        testQuestion12(sourceFilePathDemo, ruleFilePathDemo, q1ResultFilePathDemo, q2ResultFilePathDemo);
+        System.out.println("--------------- demo  -----------------------");
+        testQuestion12(sourceFilePathDemo, ruleFilePathDemo, q1ResultFilePathDemo, q2ResultFilePathDemo);
 
         System.out.println("--------------- data1  -----------------------");
         testQuestion12(sourceFilePath1, ruleFilePath1, q1ResultFilePath1, q2ResultFilePath1);
+
         System.out.println("--------------- test  -----------------------");
         testQuestion12(sourceFilePathTest, ruleFilePathTest, q1ResultFilePathTest, q2ResultFilePathTest);
         System.out.println("--------------- data2  -----------------------");
         testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
-
 
     }
 
@@ -101,7 +101,9 @@ public class KcodeAlertAnalysisTest {
             start = System.nanoTime();
             Collection<String> longestPaths = instance.getLongestPath(q2Input.getCaller(), q2Input.getResponder(), q2Input.getTime(), q2Input.getType());
             finish = System.nanoTime();
-
+            long finish2=((KcodeAlertAnalysisImpl)instance).tttt;
+            long start2=((KcodeAlertAnalysisImpl)instance).tttt2;
+//            System.out.println("评测机 "+(finish-start)+" 自测 "+(finish2-start)+" "+(finish2-start2));
             Set<Q2Result> checkResult = entry.getValue();
 //            System.out.println("答案长度="+checkResult.size());
 //            for(Q2Result r:checkResult){

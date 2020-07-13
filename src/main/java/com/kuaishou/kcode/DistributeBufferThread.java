@@ -12,14 +12,10 @@ public class DistributeBufferThread extends Thread{
     private ArrayBlockingQueue<ByteBuffer> solvedBuffer;
     private ArrayBlockingQueue<BufferWithLatch> countDownQueue;
     private static final int CHUNCK_SIZE = DataPrepareManager.DIRECT_CHUNK_SIZE;
-    private int readTimes;
     private static int lastBufferNumbers=DataPrepareManager.THREAD_NUMBER+1;
     DistributeBufferThread(){
         baseMinuteTime=-1;
         lastMinuteTime=-1;
-    }
-    public void setReadTimes(int readTimes){
-        this.readTimes=readTimes;
     }
     public void LinkDirectBufferBlockingQueue(ArrayBlockingQueue<ByteBuffer> canuse,ArrayBlockingQueue<ByteBuffer> canread){
         this.canuse=canuse;
@@ -40,9 +36,13 @@ public class DistributeBufferThread extends Thread{
         super.run();
         try {
             int bufferId=0;
-            for (long i = 0; i <readTimes; ++i) {
+            while(true) {
                 ByteBuffer buf =canread.take();
                 //拷贝 并传送buf给子任务
+                if(buf.limit()==0){
+                    canread.clear();
+                    break;
+                }
                 ByteBuffer bufOutput=null;
                 if(solvedBuffer.size()==0 && lastBufferNumbers-->0){
                     //没有可用 并且内存可分配

@@ -72,7 +72,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         ArrayList<String> ans = manager.getAnswer1();
         TimeRange t2 = new TimeRange();
+        t1.point();
 
+        if (DistributeBufferThread.baseMinuteTime > 0) {
+            throw new ArrayIndexOutOfBoundsException( "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size());
+        }
         manager.prepareQ2();
         t2.point();
         firstMinute = manager.mergeThread.firstMinute;
@@ -147,6 +151,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
     FastHashString fs=new FastHashString();
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
+    public static long tttt;
+    public static long tttt2;
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
 //        try {
@@ -154,7 +160,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        } catch (IllegalAccessException e) {
 //
 //        }
-
         int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
         int M = time.charAt(5) * 10 + time.charAt(6) - 528;
         int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528 + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15) - firstMinute;
