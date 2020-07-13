@@ -12,7 +12,7 @@ public class DataPrepareManager {
     DistributeBufferThread distributeBuffer;
     HashMapMergeThread mergeThread;
     static RawBufferSolveThread[] rawBufferSolveThreadArray = new RawBufferSolveThread[16];
-    static int THREAD_NUMBER = 4;
+    static int THREAD_NUMBER = 1;
     static ArrayBlockingQueue<ByteBuffer> canuse = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<ByteBuffer> canread = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(64);
@@ -39,7 +39,6 @@ public class DataPrepareManager {
     public void start(String path, Collection<String> alertRules) {
 
         int readTimes = diskRead.initChannel(path);
-        distributeBuffer.setReadTimes(readTimes);
         diskRead.start();
         distributeBuffer.start();
         for (int i = 0; i < THREAD_NUMBER; ++i) {

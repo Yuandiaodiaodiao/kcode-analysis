@@ -9,6 +9,7 @@ import java.util.Date;
 
 public class HashMapMergeThread extends Thread {
     ArrayBlockingQueue<BufferWithLatch> bufferQueue;
+    volatile int isFinish=0;
 
     public void LinkCountDownBuffer(ArrayBlockingQueue<BufferWithLatch> countDownQueue) {
         this.bufferQueue = countDownQueue;
@@ -161,7 +162,7 @@ public class HashMapMergeThread extends Thread {
                 if (payload == null) return;
                 servicePayload.success += payload.success;
                 servicePayload.total += payload.total;
-                for (int i = 0; i < 300; ++i) {
+                for (int i = 0; i < 500; ++i) {
                     servicePayload.bucket[i] += payload.bucket[i];
                 }
                 //释放内存
@@ -196,7 +197,7 @@ public class HashMapMergeThread extends Thread {
                     } else {
                         p.success += srp99.success;
                         p.total += srp99.total;
-                        for (int i = 0; i < 300; ++i) {
+                        for (int i = 0; i < srp99.bucket.length; ++i) {
                             p.bucket[i] += srp99.bucket[i];
                         }
                         srp99.bucket = null;
@@ -225,7 +226,7 @@ public class HashMapMergeThread extends Thread {
                         oldValue.merge(key2, value2, (oldValue2, newValue2) -> {
                             oldValue2.success += newValue2.success;
                             oldValue2.total += newValue2.total;
-                            for (int i = 0; i < 300; ++i) {
+                            for (int i = 0; i < newValue2.bucket.length; ++i) {
                                 oldValue2.bucket[i] += newValue2.bucket[i];
                             }
                             newValue2.bucket = null;
@@ -317,6 +318,7 @@ public class HashMapMergeThread extends Thread {
                     solvedMinute = i + 1;
                 }
                 if (bl.id == -1) {
+                    isFinish=1;
                     //退出 表示处理完成
                     break;
                 }
