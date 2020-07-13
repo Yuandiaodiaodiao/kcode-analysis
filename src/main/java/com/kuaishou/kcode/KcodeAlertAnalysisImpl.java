@@ -98,7 +98,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         }
         if (DistributeBufferThread.baseMinuteTime > 0) {
-            throw new ArrayIndexOutOfBoundsException(sx);
+            throw new IndexOutOfBoundsException(sx);
         }
         if (DistributeBufferThread.baseMinuteTime > 0) {
             throw new ArrayIndexOutOfBoundsException( "耗时" + t1.firstTime()
