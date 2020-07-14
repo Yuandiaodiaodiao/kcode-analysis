@@ -1,8 +1,9 @@
 package com.kuaishou.kcode;
-
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -55,7 +56,7 @@ class FastHashString {
 
     public boolean equals(Object obj) {
         FastHashString fs = (FastHashString) obj;
-        return this.hashcodelong == fs.hashcodelong;
+        return this.hashcodelong == fs.hashcodelong&& this.middle == fs.middle;
 //        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
     }
 
@@ -69,6 +70,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     HashMap<FastHashString, Collection<String>[]> fastHashMap;
+    FastHashMap<FastHashString, Collection<String>[]> fasterHashMap;
 
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
@@ -110,22 +112,27 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        if (DistributeBufferThread.baseMinuteTime > 0) {
 //            throw new IndexOutOfBoundsException(sx);
 //        }
-        AnalyzeData.printMemoryInfo();
         manager.prepareQ2();
-        AnalyzeData.printMemoryInfo();
 
         t2.point();
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
         System.out.println("time个数="+(maxMinute-firstMinute));
         Q2Answer = manager.Q2Answer;
-        fastHashMap = new HashMap<>(4096);
+
+        fastHashMap = new HashMap<>(4096*1024);
+        AnalyzeData.printMemoryInfo();
+
+        fasterHashMap=new FastHashMap<>(64*1024*1024);
+        AnalyzeData.printMemoryInfo();
+        fasterHashMap.mod=10;
         Q2Answer.forEach((key, value) -> {
             FastHashString newkey = new FastHashString(key);
             int timeIndex = maxMinute - firstMinute;
 
             Collection<String>[] ansArray = new ArrayList[(timeIndex + 2) * 2];
             fastHashMap.put(newkey, ansArray);
+            fasterHashMap.put(newkey,ansArray);
             for (int i = 0; i < timeIndex + 2; ++i) {
                 ansArray[i] = value.P99Array[i];
             }
@@ -133,6 +140,35 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 ansArray[i] = value.SRArray[j];
             }
         });
+        TimeRange doClash=new TimeRange();
+        doClash.pointFirst();
+        while(fasterHashMap.getHashClash()!=0 && doClash.firstTime()<1000){
+            fasterHashMap.clear();
+            fasterHashMap.remodbig();
+            fastHashMap.forEach((key,value)->{
+                fasterHashMap.put(key,value);
+            });
+//            System.out.println("remode"+fasterHashMap.mod);
+            doClash.pointFirst();
+        }
+        doClash.point();
+        doClash.output("解决哈希冲突");
+        System.out.println(doClash.firstTime());
+        System.out.println("哈希冲突="+fasterHashMap.getHashClash()+"/"+fastHashMap.size());
+        fasterHashMap.prepareReady();
+        TimeRange theat=new TimeRange();
+        int heatTimes=100000/fastHashMap.size();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String timeFormat=format.format(new Date((maxMinute-firstMinute)/2*60000));
+        fastHashMap.forEach((key,value)->{
+            Collection<String> s;
+            for(int i=0;i<heatTimes;++i){
+                s=getLongestPath(key.s1,key.s2,timeFormat,"P");
+                s=getLongestPath(key.s1,key.s2,timeFormat,"S");
+            }
+        });
+        theat.point();
+        theat.output("预热耗时");
         t2.point();
 //        t2.output("Q2耗时");
         t1.point();
@@ -212,7 +248,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        System.out.println("index="+);
 //        System.out.println("pos="+pos+" "+type.charAt(0));
 
-        return fastHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
+//        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
+        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
 //        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
 //                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
 //        return an;

@@ -2,30 +2,63 @@ package com.kuaishou.kcode;
 
 import java.util.HashMap;
 
-public class FastHashMap<K,V> {
-    class Node<K,V>{
-        Node(K key,V value){
-            this.key=key;
-            this.value=value;
-            this.hash=value.hashCode();
+public class FastHashMap<K, V> {
+    static class Node<K, V> {
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+            this.hash = value.hashCode();
         }
 
         K key;
         V value;
         int hash;
-        Node<K,V>next;
-    }
-    Node<K,V>[]bucket;
-    static final int MAXIMUM_CAPACITY=1<<30;
-    int capacity;
-    int mod;
-    FastHashMap(int cap){
-        this.capacity=tableSizeFor(cap);
-        bucket=new Node[this.capacity];
-        mod=maxPrime(this.capacity);
+        Node<K, V> next;
     }
 
-    static final int tableSizeFor(int cap) {
+    public static boolean[] eratos_prime(int n)// 埃拉托色尼 素数筛选法
+    {
+        boolean[] ans = new boolean[(int) n + 1];
+        for (int i = 0; i < n; i++) {
+            ans[i] = true;
+        }
+        ans[0] = ans[1] = false;
+        for (int i = 2; i <= n; i++) {
+
+            if (ans[i]) {
+                int j = i + i;
+                while (j <= n) {
+                    ans[j] = false;
+                    j += i;
+                }
+            }
+        }
+        return ans;
+    }
+
+    Node[] bucket;
+    static final int MAXIMUM_CAPACITY = 1 << 30;
+    int capacity;
+    int mod;
+    boolean[] primeArray;
+
+    FastHashMap(int cap) {
+        this.capacity = tableSizeFor(cap);
+        bucket = new Node[this.capacity];
+        primeArray = eratos_prime(this.capacity - 1);
+        mod = maxPrime(this.capacity - 1);
+    }
+
+    public void remodsmall() {
+        this.mod = maxPrime(this.mod - 1);
+    }
+
+    public void remodbig() {
+        this.mod = nextPrime(this.mod*2);
+        this.mod = Math.min(this.capacity, this.mod);
+    }
+
+    static int tableSizeFor(int cap) {
         int n = cap - 1;
         n |= n >>> 1;
         n |= n >>> 2;
@@ -34,57 +67,103 @@ public class FastHashMap<K,V> {
         n |= n >>> 16;
         return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
     }
-    public V get(K key){
-        int hash=key.hashCode();
-        Node<K,V> p=bucket[hash%mod];
-        if(p==null)return null;
-        //取出节点p
-        while(p.next!=null){
-            if(p.hash!=hash || !p.key.equals(key)){
-                p=p.next;
-            }else{
-                return p.value;
-            }
-        }
-        return p.value;
-    }
-    public V put(K key,V value){
-        int hash=key.hashCode();
-        Node<K,V> p=bucket[hash%mod];
-        if(p==null){
-            bucket[hash%mod]=new Node<>(key,value);
-            return value;
-        }
-        //取出节点p
 
-        while(p.next!=null){
-            if(p.hash!=hash || !p.key.equals(key)){
-                p=p.next;
-            }else{
-                return p.value;
-            }
-        }
-        p.key=key;
-        p.value=value;
-        p.hash=hash;
-        return p.value;
-    }
-    static int maxPrime(int n){
-        for (int i =n; i >2; i--) {
-            if(i % 2 == 0)  continue; //偶数和1排除
+    int hasClash = 1;
 
-            boolean sgin= true;
-            for (int j = 2; j <= Math.sqrt(i) ; j++) {
-                if (i % j == 0) {
-                    sgin = false;
-                    break;
+    public void prepareReady() {
+        if (getHashClash() == 0) {
+            hasClash = 0;
+        }
+    }
+
+    int clashNum = 0;
+
+    public void clear() {
+        int hasClash = 1;
+        clashNum = 0;
+        for (int i = 0; i < this.capacity; ++i) {
+            bucket[i] = null;
+        }
+    }
+
+    public int getHashClash() {
+        return clashNum;
+    }
+
+    public V get(K key) {
+
+        int hash = key.hashCode();
+        Node<K, V> p = bucket[((hash < 0) ? -hash : hash) % mod];
+        //取出节点p
+//        if (p == null) return null;
+
+        if (hasClash == 0) {
+            return p.value;
+        } else {
+            while (p.next != null) {
+                if (p.hash != hash || !p.key.equals(key)) {
+                    p = p.next;
+                } else {
+                    return p.value;
                 }
             }
-            //打印
-            if (sgin) {
+            return p.value;
+        }
+
+    }
+
+    public V put(K key, V value) {
+        int hash = key.hashCode();
+        int abshash = ((hash < 0) ? -hash : hash);
+        Node<K, V> p = bucket[abshash % mod];
+        //没有就直接放
+        if (p == null) {
+            bucket[abshash % mod] = new Node<>(key, value);
+            return value;
+        }
+        //有的话顺着next找到一样的
+        Node<K, V> lastp = null;
+
+
+        while (p != null) {
+
+            if (p.hash != hash || !p.key.equals(key)) {
+                //如果不一样就找下一个
+                lastp = p;
+                p = p.next;
+            } else {
+                //一样了就修改
+                p.key = key;
+                p.value = value;
+                p.hash = hash;
+                return p.value;
+            }
+        }
+        //整个链表上都没有
+
+        clashNum++;
+        lastp.next = new Node<>(key, value);
+        return lastp.next.value;
+
+
+    }
+
+    int maxPrime(int n) {
+        int i = 0;
+        for (i = n; i >= 2; --i) {
+            if (primeArray[i]) {
                 return i;
             }
         }
-        return n;
+        return i;
+    }
+    int nextPrime(int n) {
+        int i = 0;
+        for (i = n; i <capacity; ++i) {
+            if (primeArray[i]) {
+                return i;
+            }
+        }
+        return i;
     }
 }

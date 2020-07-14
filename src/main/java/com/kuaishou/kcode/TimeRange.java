@@ -12,6 +12,14 @@ public class TimeRange {
     public void point(){
         timeArray.add(System.nanoTime());
     }
+    public void pointFirst(){
+        if(timeArray.size()==1){
+            timeArray.add(System.nanoTime());
+
+        }else{
+            timeArray.set(1,System.nanoTime());
+        }
+    }
     public void outputus(){
         for(int i=1;i<timeArray.size();++i){
             System.out.print(" "+Math.round((timeArray.get(i)-timeArray.get(i-1))*1.0/1000));
