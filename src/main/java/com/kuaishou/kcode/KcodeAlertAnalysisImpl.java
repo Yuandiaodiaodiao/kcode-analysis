@@ -110,8 +110,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        if (DistributeBufferThread.baseMinuteTime > 0) {
 //            throw new IndexOutOfBoundsException(sx);
 //        }
-
+        AnalyzeData.printMemoryInfo();
         manager.prepareQ2();
+        AnalyzeData.printMemoryInfo();
+
         t2.point();
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;

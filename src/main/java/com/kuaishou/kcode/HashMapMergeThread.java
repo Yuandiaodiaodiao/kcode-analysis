@@ -47,8 +47,8 @@ public class HashMapMergeThread extends Thread {
     }
 
     HashMap<ByteString, RuleIpPayload> serviceMapAll;
-    int firstMinute = -1;
-    int maxMinute=0;
+    volatile int firstMinute = -1;
+    volatile int maxMinute=0;
     int solvedMinute = -1;
     RawBufferSolveThread[] threads;
     HashMap<ByteString, HashMap<Long, SingleIpPayload>>[] timeNameIpStore;

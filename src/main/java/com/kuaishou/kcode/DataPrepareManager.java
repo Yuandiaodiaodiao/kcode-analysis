@@ -62,8 +62,15 @@ public class DataPrepareManager {
                 rawBufferSolveThreadArray[i].join();
 //                System.out.println("thread"+i+"join");
             }
+            unsolvedBuffer.clear();
+            solvedBuffer.clear();
+            DistributeBufferThread.lastBufferNumbers=THREAD_NUMBER+1;
+            System.gc();
             TimeRange tz=new TimeRange();
             mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
+            for(int i=0;i<THREAD_NUMBER;++i){
+                rawBufferSolveThreadArray[i].timeNameIpStore=null;
+            }
             tz.point();
             tz.output("handleMerge");
 //            mergeThread.join();
@@ -74,14 +81,25 @@ public class DataPrepareManager {
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     public void prepareQ2(){
         DAGPrepare dag=new DAGPrepare(mergeThread.firstMinute);
-        dag.serviceMapAll=mergeThread.serviceMapAll;
-        dag.convertServiceName2VertexId();
-        dag.buildDAG();
-        dag.topsort();
-        dag.solveMaxPathLength();
-        dag.solveVertexPath();
-        dag.generateAnswer();
-        Q2Answer=dag.Q2Answer;
+        int firstM = mergeThread.firstMinute;
+        int maxM = mergeThread.maxMinute;
+        try{
+            dag.serviceMapAll=mergeThread.serviceMapAll;
+            dag.convertServiceName2VertexId();
+            dag.buildDAG();
+            dag.topsort();
+            dag.solveMaxPathLength();
+            dag.solveVertexPath();
+            int firstMinute = mergeThread.firstMinute;
+            int maxMinute = mergeThread.maxMinute;
+            dag.generateAnswer(firstMinute,maxMinute);
+            Q2Answer=dag.Q2Answer;
+
+        }catch (OutOfMemoryError e){
+//            System.out.println(e.getCause());
+        throw new ArrayIndexOutOfBoundsException("OOM"+(maxM-firstM));
+        }
+
     }
     public ArrayList<String>getAnswer1(){
         return mergeThread.warningList;

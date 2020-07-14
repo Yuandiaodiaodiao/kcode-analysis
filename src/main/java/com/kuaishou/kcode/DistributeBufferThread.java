@@ -13,7 +13,7 @@ public class DistributeBufferThread extends Thread{
     private ArrayBlockingQueue<ByteBuffer> solvedBuffer;
     private ArrayBlockingQueue<BufferWithLatch> countDownQueue;
     private static final int CHUNCK_SIZE = DataPrepareManager.DIRECT_CHUNK_SIZE;
-    private static int lastBufferNumbers=DataPrepareManager.THREAD_NUMBER+1;
+     static int lastBufferNumbers=DataPrepareManager.THREAD_NUMBER+1;
     DistributeBufferThread(){
         baseMinuteTime=-1;
         lastMinuteTime=-1;

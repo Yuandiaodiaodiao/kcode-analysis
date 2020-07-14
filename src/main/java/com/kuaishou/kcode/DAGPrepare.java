@@ -272,7 +272,8 @@ public class DAGPrepare {
 
     static DecimalFormat DFORMAT = new DecimalFormat("#.00%");
 
-    void generateAnswer() {
+    void generateAnswer(int firstMinute,int maxMinute) {
+        int minuteIndex=maxMinute-firstMinute+3;
         Q2Answer = new HashMap<>(4096);
         serviceMapAll.forEach((key, value) -> {
             Vertex from = vertexMap.get(key.first());
@@ -299,7 +300,7 @@ public class DAGPrepare {
                     int index2 = p99builder.index;
                     //处理minute SR
 
-                    for (int i = 0; i < DataPrepareManager.MAXTIME; ++i) {
+                    for (int i = 0; i < minuteIndex; ++i) {
                         for (int j = b1.vertexArrayList.size() - 1; j >= 1; --j) {
                             int f = b1.vertexArrayList.get(j);
                             int t = b1.vertexArrayList.get(j - 1);
