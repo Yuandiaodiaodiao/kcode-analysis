@@ -157,6 +157,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         System.out.println("哈希冲突="+fasterHashMap.getHashClash()+"/"+fastHashMap.size());
         fasterHashMap.prepareReady();
         TimeRange theat=new TimeRange();
+        System.gc();
         if(true){
             int heatTimes=100000/fastHashMap.size();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -175,7 +176,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        t2.output("Q2耗时");
         t1.point();
         t1.output("read 耗时");
-        System.gc();
+
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -251,7 +252,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        System.out.println("pos="+pos+" "+type.charAt(0));
 
 //        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
-        return fastHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
+        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
 //        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
 //                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
 //        return an;
