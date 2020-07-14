@@ -65,7 +65,7 @@ public class DataPrepareManager {
             unsolvedBuffer.clear();
             solvedBuffer.clear();
             DistributeBufferThread.lastBufferNumbers=THREAD_NUMBER+1;
-            System.gc();
+//            System.gc();
             TimeRange tz=new TimeRange();
             mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
             for(int i=0;i<THREAD_NUMBER;++i){
