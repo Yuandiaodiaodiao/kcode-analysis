@@ -1,4 +1,6 @@
 package com.kuaishou.kcode;
+import com.kuaishou.kcode.compiler.CompilerTest;
+
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
-
+        CompilerTest.output();
         TimeRange t1 = new TimeRange();
         manager.start(path, alertRules);
         manager.stop();

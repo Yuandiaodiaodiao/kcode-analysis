@@ -23,6 +23,20 @@ public class CompilerTest {
             e.printStackTrace();
         }
     }
+
+    public static void output(){
+        CompilerTest t=new CompilerTest();
+        try {
+            t.setUp();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            t.testCompileSingleClass();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void setUp() throws Exception {
         compiler = new JavaStringCompiler();
 
