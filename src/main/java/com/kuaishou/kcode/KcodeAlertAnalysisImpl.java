@@ -157,16 +157,18 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         System.out.println("哈希冲突="+fasterHashMap.getHashClash()+"/"+fastHashMap.size());
         fasterHashMap.prepareReady();
         TimeRange theat=new TimeRange();
-        int heatTimes=100000/fastHashMap.size();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        String timeFormat=format.format(new Date((maxMinute-firstMinute)/2*60000));
-        fastHashMap.forEach((key,value)->{
-            Collection<String> s;
-            for(int i=0;i<heatTimes;++i){
-                s=getLongestPath(key.s1,key.s2,timeFormat,"P");
-                s=getLongestPath(key.s1,key.s2,timeFormat,"S");
-            }
-        });
+        if(true){
+            int heatTimes=100000/fastHashMap.size();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String timeFormat=format.format(new Date((maxMinute-firstMinute)/2*60000));
+            fastHashMap.forEach((key,value)->{
+                Collection<String> s;
+                for(int i=0;i<heatTimes;++i){
+                    s=getLongestPath(key.s1,key.s2,timeFormat,"P");
+                    s=getLongestPath(key.s1,key.s2,timeFormat,"S");
+                }
+            });
+        }
         theat.point();
         theat.output("预热耗时");
         t2.point();
@@ -249,7 +251,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        System.out.println("pos="+pos+" "+type.charAt(0));
 
 //        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
-        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
+        return fastHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
 //        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
 //                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
 //        return an;

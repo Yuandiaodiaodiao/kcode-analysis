@@ -50,14 +50,14 @@ public class KcodeAlertAnalysisTest {
         String q2ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q2Result-2.txt";
 
         System.out.println("--------------- demo  -----------------------");
-//        testQuestion12(sourceFilePathDemo, ruleFilePathDemo, q1ResultFilePathDemo, q2ResultFilePathDemo);
+        testQuestion12(sourceFilePathDemo, ruleFilePathDemo, q1ResultFilePathDemo, q2ResultFilePathDemo);
 
         System.out.println("--------------- data1  -----------------------");
         testQuestion12(sourceFilePath1, ruleFilePath1, q1ResultFilePath1, q2ResultFilePath1);
 
 
         System.out.println("--------------- test  -----------------------");
-//        testQuestion12(sourceFilePathTest, ruleFilePathTest, q1ResultFilePathTest, q2ResultFilePathTest);
+        testQuestion12(sourceFilePathTest, ruleFilePathTest, q1ResultFilePathTest, q2ResultFilePathTest);
         System.out.println("--------------- data2  -----------------------");
         testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
 
