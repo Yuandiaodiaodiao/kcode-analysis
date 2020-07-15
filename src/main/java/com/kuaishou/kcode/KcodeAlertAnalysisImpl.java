@@ -1,13 +1,12 @@
 package com.kuaishou.kcode;
 
 import com.kuaishou.kcode.compiler.CompilerTest;
-import com.kuaishou.kcode.hash.FashHashStringInterface;
-import com.kuaishou.kcode.hash.HashAnalyzer;
-import com.kuaishou.kcode.hash.HashClassGenerator;
+import com.kuaishou.kcode.hash.*;
 import jdk.nashorn.internal.objects.NativeInt8Array;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
@@ -74,7 +73,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             if (bestHash == 0) {
                 char[] c1 = (char[]) THE_UNSAFE.getObject(s1, 12);
                 char[] c2 = (char[]) THE_UNSAFE.getObject(s2, 12);
-                hashcodelong=0;
+                hashcodelong = 0;
                 for (int a = 0; a < HN1; ++a) {
                     hashcodelong = c1[a] + hashcodelong * 31;
                 }
@@ -207,6 +206,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
     }
 
+    FastHashMap<HardHashInterface, Collection<String>[]> fastestHashMap;
+
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
@@ -260,7 +261,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fasterHashMap = new FastHashMap<>(64 * 1024 * 1024);
         AnalyzeData.printMemoryInfo();
         fasterHashMap.mod = 10;
-        HashClassGenerator.test();
+//        HashClassGenerator.test();
         fs = new HashString();
         Q2Answer.forEach((key, value) -> {
 //            FastHashString newkey = new FastHashString();
@@ -299,9 +300,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
+
         boolean canBestHash = false;
-        if(bestHash!= null){
-            canBestHash=true;
+        if (bestHash != null) {
+            canBestHash = true;
         }
         if (canBestHash) {
             fs.bestHash = 0;
@@ -329,10 +331,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
         TimeRange doClash = new TimeRange();
         doClash.pointFirst();
-        int lastMod=0;
-        while (fasterHashMap.getHashClash() != 0 && lastMod!=fasterHashMap.mod) {
+        int lastMod = 0;
+        while (fasterHashMap.getHashClash() != 0 && lastMod != fasterHashMap.mod) {
             fasterHashMap.clear();
-            lastMod=fasterHashMap.mod;
+            lastMod = fasterHashMap.mod;
             fasterHashMap.remodbig();
 //            System.out.println("mod="+fasterHashMap.mod);
             fastHashMap.forEach((key, value) -> {
@@ -355,14 +357,26 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
 
 
-
-
-
         doClash.point();
         doClash.output("解决哈希冲突");
         System.out.println(doClash.firstTime());
         System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
         fasterHashMap.prepareReady();
+        int mod=fasterHashMap.mod;
+        fasterHashMap=null;
+        Class<?>clzz= HashClassGenerator.generateHashCoder(bestHash);
+        ffs=HashClassGenerator.getInstance();
+     
+        fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
+        fastestHashMap.mod = mod;
+        fastHashMap.forEach((key, value) -> {
+            HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
+            fastestHashMap.put(newKey, value);
+        });
+        fastestHashMap.prepareReady();
+        System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
+
+
         TimeRange theat = new TimeRange();
         System.gc();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -372,7 +386,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528 - firstMinute;
         prepareTime = t;
         timeIndex = maxMinute - firstMinute;
-
+//预热
         if (true) {
             final int[] heatTimes = {1499};
             String timeFormat = format.format(new Date((maxMinute - firstMinute) / 2 * 60000L));
@@ -380,6 +394,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 Collection<String> s;
                 while (heatTimes[0] > 0) {
                     heatTimes[0]--;
+//                    s=getLongestPath2(key.s1, key.s2, timeFormat, "P");
 //                    int tt=getTime(timeFormat);
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "S");
@@ -449,7 +464,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     }
 
-
+    HardHashInterface ffs;
     HashString fs;
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
     public static long tttt;
@@ -464,10 +479,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         return t;
     }
 
-
-
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
+
+        ffs.fromString(caller, responder);
+        return fastestHashMap.get(ffs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
+    }
+
+    public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {
         fs.fromString(caller, responder);
         return fasterHashMap.get(fs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
 //        return realgetLongestPath(caller, responder, time, type);

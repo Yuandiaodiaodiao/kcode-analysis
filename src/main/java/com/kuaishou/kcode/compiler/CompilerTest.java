@@ -25,7 +25,7 @@ public class CompilerTest {
         }
     }
 
-    public static  Class<?>   output(String source){
+    public static  Class<?>   output(String source,String sourceName,String packageName){
         CompilerTest t=new CompilerTest();
         try {
             t.setUp();
@@ -33,7 +33,7 @@ public class CompilerTest {
             e.printStackTrace();
         }
         try {
-            return t.CompileSingleClass(source);
+            return t.CompileSingleClass(source,sourceName,packageName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,10 +51,10 @@ public class CompilerTest {
             + "        System.out.println(\"ohhhhhhh\");                                     "
             + "    }                                                          "
             + "}                                                              ";
-    public  Class<?>  CompileSingleClass(String sourceCode) throws Exception {
-        Map<String, byte[]> results = compiler.compile("HardCodeHash.java", sourceCode);
+    public  Class<?>  CompileSingleClass(String sourceCode,String sourceName,String packageName) throws Exception {
+        Map<String, byte[]> results = compiler.compile(sourceName, sourceCode);
 
-        Class<?> clazz = compiler.loadClass("com.kuaishou.kcode.hash.HardCodeHash", results);
+        Class<?> clazz = compiler.loadClass(packageName, results);
         return clazz;
         // get method:
 //        Method setName = clazz.getMethod("setName", String.class);

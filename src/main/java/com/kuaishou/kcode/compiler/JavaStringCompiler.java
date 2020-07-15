@@ -1,6 +1,7 @@
 package com.kuaishou.kcode.compiler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -40,7 +41,9 @@ public class JavaStringCompiler {
 	public Map<String, byte[]> compile(String fileName, String source) throws IOException {
 		try (MemoryJavaFileManager manager = new MemoryJavaFileManager(stdManager)) {
 			JavaFileObject javaFileObject = manager.makeStringSource(fileName, source);
-			CompilationTask task = compiler.getTask(null, manager, null, null, null, Arrays.asList(javaFileObject));
+			ArrayList<String>opt=new ArrayList<>();
+			opt.add("-Xlint:deprecation");
+			CompilationTask task = compiler.getTask(null, manager, null, opt, null, Arrays.asList(javaFileObject));
 			Boolean result = task.call();
 			if (result == null || !result.booleanValue()) {
 				throw new RuntimeException("Compilation failed.");
