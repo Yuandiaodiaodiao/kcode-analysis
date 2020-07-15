@@ -6,6 +6,7 @@ import jdk.nashorn.internal.objects.NativeInt8Array;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
@@ -361,16 +362,19 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         System.out.println(doClash.firstTime());
         System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
         fasterHashMap.prepareReady();
-
-        HashClassGenerator.generateHashCoder(bestHash);
+        int mod=fasterHashMap.mod;
+        fasterHashMap=null;
+        Class<?>clzz= HashClassGenerator.generateHashCoder(bestHash);
         ffs=HashClassGenerator.getInstance();
+     
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
-        fastestHashMap.mod = fasterHashMap.mod;
+        fastestHashMap.mod = mod;
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
             fastestHashMap.put(newKey, value);
         });
         fastestHashMap.prepareReady();
+        System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
 
 
         TimeRange theat = new TimeRange();
@@ -390,7 +394,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 Collection<String> s;
                 while (heatTimes[0] > 0) {
                     heatTimes[0]--;
-                    s=getLongestPath2(key.s1, key.s2, timeFormat, "P");
+//                    s=getLongestPath2(key.s1, key.s2, timeFormat, "P");
 //                    int tt=getTime(timeFormat);
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "S");
@@ -475,13 +479,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         return t;
     }
 
-    public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {
+    @Override
+    public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
+
         ffs.fromString(caller, responder);
         return fastestHashMap.get(ffs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
     }
 
-    @Override
-    public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
+    public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {
         fs.fromString(caller, responder);
         return fasterHashMap.get(fs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
 //        return realgetLongestPath(caller, responder, time, type);

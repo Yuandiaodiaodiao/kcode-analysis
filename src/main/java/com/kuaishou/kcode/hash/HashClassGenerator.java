@@ -8,7 +8,7 @@ import com.kuaishou.kcode.compiler.User;
 import java.lang.reflect.Method;
 
 public class HashClassGenerator {
-    static int[] powArray = new int[256];
+    static long[] powArray = new long[256];
     static {
         powArray[0] = 1;
         for (int a = 1; a < 256; ++a) {
@@ -47,23 +47,23 @@ public class HashClassGenerator {
             if(args[0]>0){
 
                 for(int a=0;a<args[0];++a){
-                    b.append("c1[").append(a).append("]").append("*(").append(powArray[--allIndex]).append(")+\n");
-                }
-            }
-            if(args[1]>0){
-                for(int a=args[1];a>0;--a){
-                    b.append("c1[").append("middle-").append(a).append("]").append("*(").append(powArray[--allIndex]).append(")+");
+                    b.append("c1[").append(a).append("]").append("*(").append(powArray[--allIndex]).append("L)+\n");
                 }
             }
             if(args[2]>0){
+                for(int a=args[2];a>0;--a){
+                    b.append("c1[").append("middle-").append(a).append("]").append("*(").append(powArray[--allIndex]).append("L)+\n");
+                }
+            }
+            if(args[1]>0){
 
-                for(int a=0;a<args[2];++a){
-                    b.append("c2[").append(a).append("]").append("*(").append(powArray[--allIndex]).append(")+\n");
+                for(int a=0;a<args[1];++a){
+                    b.append("c2[").append(a).append("]").append("*(").append(powArray[--allIndex]).append("L)+\n");
                 }
             }
             if(args[3]>0){
                 for(int a=args[3];a>0;--a){
-                    b.append("c2[").append("s2length-").append(a).append("]").append("*(").append(powArray[--allIndex]).append(")+");
+                    b.append("c2[").append("s2length-").append(a).append("]").append("*(").append(powArray[--allIndex]).append("L)+\n");
                 }
             }
             b.append(0).append(";");
