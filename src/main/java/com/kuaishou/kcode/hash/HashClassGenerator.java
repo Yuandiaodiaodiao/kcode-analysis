@@ -34,6 +34,8 @@ public class HashClassGenerator {
             for (int i = 0; i < 4; ++i) {
                 allIndex += args[i];
             }
+            allIndex-=args[4];
+            allIndex-=args[5];
         }
         if (args == null || allIndex == 0) {
             b.append(" middle = s1.length();\n" +
@@ -58,7 +60,7 @@ public class HashClassGenerator {
                 if(args[2]==0){
                     b.append("(\n");
                 }
-                for (int a = 0; a < args[0]; ++a) {
+                for (int a = args[4]; a < args[0]; ++a) {
                     --allIndex;
                     int mul = intpowArray[--lastIndex];
                     if (mul != 1) {
@@ -90,10 +92,11 @@ public class HashClassGenerator {
             if(args[0]>0&&args[2]>0){
                 b.append(")*(").append(powArray[allIndex]).append("L)+");
             }
+
             b.append("\n");
             if (args[1] > 0) {
                 int lastIndex = args[1]+args[3];
-                for (int a = 0; a < args[1]; ++a) {
+                for (int a = args[5]; a < args[1]; ++a) {
                     --allIndex;
                     int mul = intpowArray[--lastIndex];
                     if (mul != 1) {
@@ -111,12 +114,12 @@ public class HashClassGenerator {
                     if (mul != 1) {
                         b.append("c2[").append("s2length-").append(a).append("]").append("*(").append(mul).append(")+\n");
                     } else {
-                        b.append("c2[").append("s2length-").append(a).append("]").append("+");
+                        b.append("c2[").append("s2length-").append(a).append("]").append("+\n");
                     }
                 }
             }
 
-            b.setLength(b.length()-1);
+            b.setLength(b.length()-2);
             b.append(";");
 
             b.append(" length = middle + s2length;\n" +

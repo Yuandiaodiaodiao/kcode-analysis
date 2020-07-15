@@ -28,12 +28,14 @@ public class HashAnalyzer {
         System.out.println("最小长度1="+minService1Len+"最小长度2="+minService2Len);
         System.out.println("平均长度1="+avg1+"最小长度2="+avg2);
         int minUseda=99999;
-        int [] bestarg=new int[4];
+        int [] bestarg=new int[6];
+
+
 
         for(int front1=minService1Len.get();front1>=0;--front1){
             boolean success=false;
             for(int front2=minService2Len.get();front2>=0;--front2){
-                boolean canFront=frontUnique(front1,front2,fastHashMap);
+                boolean canFront=frontUnique(0,0,front1,front2,fastHashMap);
                 if(!canFront){
                     break;
                 }else{
@@ -53,7 +55,32 @@ public class HashAnalyzer {
 
 
         if(minUseda<99999){
-            System.out.println("最优参数="+bestarg[0]+" "+bestarg[1]);
+            int front1=bestarg[0];
+            int front2=bestarg[1];
+            for(int starta=1;starta<front1;++starta){
+                boolean success=false;
+                for(int startb=1;startb<front2;++startb){
+                    boolean canFront=frontUnique(starta,startb,front1,front2,fastHashMap);
+                    if(!canFront){
+                        break;
+                    }else{
+                        success=true;
+                        int cost=front1+front2-starta-startb;
+                        if(cost<minUseda){
+                            minUseda=cost;
+                            bestarg[4]=starta;
+                            bestarg[5]=startb;
+                        }
+                    }
+                }
+                if(!success){
+                    break;
+                }
+            }
+
+
+
+            System.out.println("最优参数="+bestarg[0]+" "+bestarg[1]+" "+bestarg[4]+" "+bestarg[5]);
             return bestarg;
         }
         TimeRange t=new TimeRange();
@@ -71,7 +98,7 @@ public class HashAnalyzer {
                         }
                         int tot=front1+front2+back1+back2;
 
-                        boolean canFrontAndBack=frontAndBack(front1,front2,back1,back2,fastHashMap);
+                        boolean canFrontAndBack=frontAndBack(0,0,front1,front2,back1,back2,fastHashMap);
                         if(canFrontAndBack){
                             if(tot<minUsed){
                                 minUsed=tot;
@@ -94,21 +121,48 @@ public class HashAnalyzer {
             }
         }
         if(minUsed==99999){
+
+
+
             System.out.println("不可哈希优化");
             return null;
         }else{
 
+            int front1=bestarg[0];
+            int front2=bestarg[1];
+            int back1=bestarg[2];
+            int back2=bestarg[3];
+            for(int starta=1;starta<front1;++starta){
+                boolean success=false;
+                for(int startb=1;startb<front2;++startb){
+                    boolean canFront=frontAndBack(starta,startb,front1,front2,back1,back2,fastHashMap);
+                    if(!canFront){
+                        break;
+                    }else{
+                        success=true;
+                        int cost=front1+front2+back1+back2-starta-startb;
+                        if(cost<minUseda){
+                            minUseda=cost;
+                            bestarg[4]=starta;
+                            bestarg[5]=startb;
+                        }
+                    }
+                }
+                if(!success){
+                    break;
+                }
+            }
             return bestarg;
         }
 
 
     }
-    static boolean frontUnique(int minService1Len,int minService2Len,HashMap<HashString, Collection<String>[]> fastHashMap){
+    static boolean frontUnique(int start1,int start2,int minService1Len,int minService2Len,HashMap<HashString, Collection<String>[]> fastHashMap){
         HashSet<HashString> hashMap2=new HashSet<>();
         fastHashMap.forEach((key,value)->{
             HashString fs1=new HashString();
-            String news1=key.s1.substring(0,minService1Len);
-            String news2=key.s2.substring(0,minService2Len);
+            String news1=key.s1.substring(start1,minService1Len);
+            String news2=key.s2.substring(start2,minService2Len);
             fs1.fromString(news1,news2);
             hashMap2.add(fs1);
         });
@@ -118,12 +172,12 @@ public class HashAnalyzer {
         }
         return false;
     }
-    static boolean frontAndBack(int minService1Len,int minService2Len,int backlen1,int backlen2,HashMap<HashString, Collection<String>[]> fastHashMap){
+    static boolean frontAndBack(int starta,int startb,int minService1Len,int minService2Len,int backlen1,int backlen2,HashMap<HashString, Collection<String>[]> fastHashMap){
         HashSet<HashString> hashMap2=new HashSet<>();
         fastHashMap.forEach((key,value)->{
             HashString fs1=new HashString();
-            String news1=key.s1.substring(0,minService1Len);
-            String news2=key.s2.substring(0,minService2Len);
+            String news1=key.s1.substring(starta,minService1Len);
+            String news2=key.s2.substring(startb,minService2Len);
             news1+=key.s1.substring(key.s1.length()-backlen1,key.s1.length());
             news2+=key.s2.substring(key.s2.length()-backlen2,key.s2.length());
             fs1.fromString(news1,news2);
