@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class TimeRange {
     ArrayList<Long>timeArray=new ArrayList<>();
-    TimeRange(){
+    public TimeRange(){
         timeArray.add(System.nanoTime());
     }
     public synchronized void pointsync(){timeArray.add(System.nanoTime());}

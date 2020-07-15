@@ -2,6 +2,7 @@ package com.kuaishou.kcode.compiler;
 
 
 
+import javax.security.auth.kerberos.KerberosTicket;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class CompilerTest {
         }
     }
 
-    public static void output(){
+    public static  Class<?>   output(String source){
         CompilerTest t=new CompilerTest();
         try {
             t.setUp();
@@ -32,10 +33,11 @@ public class CompilerTest {
             e.printStackTrace();
         }
         try {
-            t.testCompileSingleClass();
+            return t.CompileSingleClass(source);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
     public void setUp() throws Exception {
         compiler = new JavaStringCompiler();
@@ -49,7 +51,22 @@ public class CompilerTest {
             + "        System.out.println(\"ohhhhhhh\");                                     "
             + "    }                                                          "
             + "}                                                              ";
+    public  Class<?>  CompileSingleClass(String sourceCode) throws Exception {
+        Map<String, byte[]> results = compiler.compile("HardCodeHash.java", sourceCode);
 
+        Class<?> clazz = compiler.loadClass("com.kuaishou.kcode.hash.HardCodeHash", results);
+        return clazz;
+        // get method:
+//        Method setName = clazz.getMethod("setName", String.class);
+        // try instance:
+//        Object obj = clazz.newInstance();
+
+        // set:
+//        setName.invoke(obj, "Fly");
+        // get as user:
+//        User user = (User) obj;
+//        return obj;
+    }
     public void testCompileSingleClass() throws Exception {
         Map<String, byte[]> results = compiler.compile("UserProxy.java", SINGLE_JAVA);
 

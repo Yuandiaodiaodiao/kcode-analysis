@@ -3,10 +3,10 @@ package com.kuaishou.kcode;
 import java.nio.ByteBuffer;
 
 public final class ByteString {
-    byte[] value;
-    int length;
-    int middle;
-    int offset = 0;
+    public byte[] value;
+    public int length;
+    public int middle;
+    public int offset = 0;
     public String toString(){
         StringBuilder sb=new StringBuilder();
         for (int a = offset; a < length; ++a) {
@@ -20,7 +20,7 @@ public final class ByteString {
         }
     }
 
-    ByteString() {
+    public ByteString() {
 
     }
 
