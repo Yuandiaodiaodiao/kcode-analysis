@@ -299,6 +299,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
+
         boolean canBestHash = false;
         if(bestHash!= null){
             canBestHash=true;
