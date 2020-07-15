@@ -16,7 +16,7 @@ public interface HardHashInterface {
 
 
 
-    public void fromString(String s1, String s2);
+    public int fromString(String s1, String s2);
 
     public int hashCode();
 

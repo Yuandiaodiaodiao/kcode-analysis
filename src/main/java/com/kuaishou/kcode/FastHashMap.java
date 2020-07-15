@@ -89,11 +89,13 @@ public class FastHashMap<K, V> {
     public int getHashClash() {
         return clashNum;
     }
-
+    public V get(int i){
+        return (V) bucket[((i<<1)>>>1)%mod].value;
+    }
     public V get(K key) {
 
         int hash = key.hashCode();
-        Node<K, V> p = bucket[((hash < 0) ? -hash : hash) % mod];
+        Node<K, V> p = bucket[((hash<<1)>>>1) % mod];
         //取出节点p
 //        if (p == null) return null;
 
@@ -114,7 +116,7 @@ public class FastHashMap<K, V> {
 
     public V put(K key, V value) {
         int hash = key.hashCode();
-        int abshash = ((hash < 0) ? -hash : hash);
+        int abshash =((hash<<1)>>>1);
         Node<K, V> p = bucket[abshash % mod];
         //没有就直接放
         if (p == null) {

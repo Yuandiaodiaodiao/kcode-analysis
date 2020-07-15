@@ -48,7 +48,8 @@ public class KcodeAlertAnalysisTest {
         String q1ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q1Result-2.txt";
         // Q2Result-2.txt，第二问输出和结果
         String q2ResultFilePath2 = "D:\\Github\\kcodedata\\data2\\Q2Result-2.txt";
-
+        System.out.println("--------------- data2  -----------------------");
+        testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
         System.out.println("--------------- demo  -----------------------");
        // testQuestion12(sourceFilePathDemo, ruleFilePathDemo, q1ResultFilePathDemo, q2ResultFilePathDemo);
 
@@ -58,8 +59,7 @@ public class KcodeAlertAnalysisTest {
 
         System.out.println("--------------- test  -----------------------");
         testQuestion12(sourceFilePathTest, ruleFilePathTest, q1ResultFilePathTest, q2ResultFilePathTest);
-        System.out.println("--------------- data2  -----------------------");
-        testQuestion12(sourceFilePath2, ruleFilePath2, q1ResultFilePath2, q2ResultFilePath2);
+
 
     }
 

@@ -207,6 +207,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     FastHashMap<HardHashInterface, Collection<String>[]> fastestHashMap;
+    Class<?> finalClass;
 
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
@@ -260,7 +261,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         fasterHashMap = new FastHashMap<>(64 * 1024 * 1024);
         AnalyzeData.printMemoryInfo();
-        fasterHashMap.mod = 10;
+        fasterHashMap.mod = 10000;
 //        HashClassGenerator.test();
         fs = new HashString();
         Q2Answer.forEach((key, value) -> {
@@ -330,7 +331,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             });
         }
         TimeRange doClash = new TimeRange();
-        doClash.pointFirst();
         int lastMod = 0;
         while (fasterHashMap.getHashClash() != 0 && lastMod != fasterHashMap.mod) {
             fasterHashMap.clear();
@@ -353,28 +353,42 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
             });
 //            System.out.println("remode"+fasterHashMap.mod);
-            doClash.pointFirst();
         }
 
 
         doClash.point();
         doClash.output("解决哈希冲突");
-        System.out.println(doClash.firstTime());
         System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
         fasterHashMap.prepareReady();
-        int mod=fasterHashMap.mod;
-        fasterHashMap=null;
-        Class<?>clzz= HashClassGenerator.generateHashCoder(bestHash);
-        ffs=HashClassGenerator.getInstance();
-     
+        int mod = fasterHashMap.mod;
+        fasterHashMap = null;
+        finalClass = HashClassGenerator.generateHashCoder(bestHash);
+        ffs = HashClassGenerator.getInstance();
+
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
         fastestHashMap.mod = mod;
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
             fastestHashMap.put(newKey, value);
         });
+        doClash = new TimeRange();
+        lastMod = 0;
+        while (fastestHashMap.getHashClash() != 0 && lastMod != fastestHashMap.mod) {
+            fastestHashMap.clear();
+            lastMod = fastestHashMap.mod;
+            fastestHashMap.remodbig();
+//            System.out.println("mod="+fasterHashMap.mod);
+            fastHashMap.forEach((key, value) -> {
+                HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
+                fastestHashMap.put(newKey, value);
+
+            });
+//            System.out.println("remode"+fasterHashMap.mod);
+        }
+        doClash.point();
+        doClash.output("解决哈希冲突用时");
         fastestHashMap.prepareReady();
-        System.out.println("哈希冲突=" + fastestHashMap.getHashClash() + "/" + fastHashMap.size());
+        System.out.println("哈希冲突=" + fastestHashMap.getHashClash() + "/" + fastHashMap.size() + "mod=" + fastestHashMap.mod);
 
 
         TimeRange theat = new TimeRange();
@@ -398,7 +412,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //                    int tt=getTime(timeFormat);
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "S");
-//                    s = getLongestPath(key.s1, key.s2, timeFormat, "P");
+                    s = getLongestPath(key.s1, key.s2, timeFormat, "P");
                     s = getLongestPath(key.s1, key.s2, timeFormat, "S");
                 }
             });
@@ -481,9 +495,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-
-        ffs.fromString(caller, responder);
-        return fastestHashMap.get(ffs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
+        int hashi=ffs.fromString(caller, responder);
+        return fastestHashMap.get(hashi)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
     }
 
     public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {

@@ -48,7 +48,7 @@ public class HardHashImpl  implements HardHashInterface{
 
 
 
-    public void fromString(String s1, String s2) {
+    public int fromString(String s1, String s2) {
         this.s1 = s1;
         this.s2 = s2;
         if (bestHash == 0) {
@@ -78,7 +78,7 @@ public class HardHashImpl  implements HardHashInterface{
             hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();
             hashint = (int) (hashcodelong % 1000000007);
         }
-
+        return hashint;
     }
 
     public int hashCode() {
