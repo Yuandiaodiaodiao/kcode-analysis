@@ -363,6 +363,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fasterHashMap.prepareReady();
 
         HashClassGenerator.generateHashCoder(bestHash);
+        ffs=HashClassGenerator.getInstance();
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
         fastestHashMap.mod = fasterHashMap.mod;
         fastHashMap.forEach((key, value) -> {
@@ -389,6 +390,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 Collection<String> s;
                 while (heatTimes[0] > 0) {
                     heatTimes[0]--;
+                    s=getLongestPath2(key.s1, key.s2, timeFormat, "P");
 //                    int tt=getTime(timeFormat);
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "S");

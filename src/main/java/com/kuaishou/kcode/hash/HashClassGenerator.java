@@ -75,7 +75,7 @@ public class HashClassGenerator {
         b.append(" \n }\n");
         String strHashCore=b.toString();
         String allStr=sFront+strHashCore+sBottom;
-        clazz=generate(allStr);
+        clazz=generate(allStr,"HardHashImpl2.java","com.kuaishou.kcode.hash.HardHashImpl2");
         return clazz;
     }
 
@@ -196,7 +196,7 @@ public class HashClassGenerator {
                 "//        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);\n" +
                 "        }"+
                 "}\n";
-          clazz=generate(s);
+          clazz=generate(s,"1","1");
           return clazz;
     }
     public static HardHashInterface getInstance(){
@@ -223,7 +223,7 @@ public class HashClassGenerator {
         return null;
     }
     static  Class<?> clazz;
-    public static Class<?> generate(String s){
-        return  CompilerTest.output(s);
+    public static Class<?> generate(String s,String fileName,String packageName){
+        return  CompilerTest.output(s,fileName,packageName);
     }
 }
