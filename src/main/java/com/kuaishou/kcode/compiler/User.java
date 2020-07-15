@@ -3,7 +3,7 @@ package com.kuaishou.kcode.compiler;
 /**
  * Sample class as JavaBean.
  * 
- * @author michael
+ *
  */
 public class User {
 

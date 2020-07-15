@@ -13,7 +13,7 @@ import javax.tools.JavaCompiler.CompilationTask;
 /**
  * In-memory compile Java source code as String.
  * 
- * @author michael
+ *
  */
 public class JavaStringCompiler {
 

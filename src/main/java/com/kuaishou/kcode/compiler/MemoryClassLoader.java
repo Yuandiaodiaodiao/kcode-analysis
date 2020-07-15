@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Load class from byte[] which is compiled in memory.
  * 
- * @author michael
+ *
  */
 class MemoryClassLoader extends URLClassLoader {
 

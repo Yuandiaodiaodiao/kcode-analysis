@@ -1,5 +1,6 @@
 package com.kuaishou.kcode;
 import com.kuaishou.kcode.compiler.CompilerTest;
+import com.kuaishou.kcode.hash.HashAnalyzer;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -12,61 +13,61 @@ import java.util.HashMap;
  * @author KCODE
  * Created on 2020-07-04
  */
-class FastHashString {
-    int length;
-    int middle;
-    String s1, s2;
-    static long[] powArray = new long[256];
 
-    static {
-        powArray[0] = 1;
-        for (int a = 1; a <= 200; ++a) {
-            powArray[a] = powArray[a - 1] * 31;
-        }
-    }
-
-    FastHashString() {
-    }
-
-    FastHashString(ByteString bs) {
-        StringBuilder sb = new StringBuilder();
-        for (int a = bs.offset; a < bs.middle; ++a) {
-            sb.append((char) bs.value[a]);
-        }
-        s1 = sb.toString();
-        sb.setLength(0);
-        for (int a = bs.middle; a < bs.length; ++a) {
-            sb.append((char) bs.value[a]);
-        }
-        s2 = sb.toString();
-        fromString(s1, s2);
-    }
-
-    long hashcodelong;
-
-    void fromString(String s1, String s2) {
-        this.s1 = s1;
-        this.s2 = s2;
-        middle = s1.length();
-        length = middle + s2.length();
-        hashcodelong = s1.hashCode() * powArray[length - middle] + s2.hashCode();
-    }
-
-    public int hashCode() {
-        return (int) (hashcodelong % 1000000007);
-    }
-
-    public boolean equals(Object obj) {
-        FastHashString fs = (FastHashString) obj;
-        return this.hashcodelong == fs.hashcodelong&& this.middle == fs.middle;
-//        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
-    }
-
-}
 
 public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     private DataPrepareManager manager;
+    public static class FastHashString {
+        public int length;
+        public int middle;
+        public String s1, s2;
+        static long[] powArray = new long[256];
 
+        static {
+            powArray[0] = 1;
+            for (int a = 1; a <= 200; ++a) {
+                powArray[a] = powArray[a - 1] * 31;
+            }
+        }
+
+        public FastHashString() {
+        }
+
+        FastHashString(ByteString bs) {
+            StringBuilder sb = new StringBuilder();
+            for (int a = bs.offset; a < bs.middle; ++a) {
+                sb.append((char) bs.value[a]);
+            }
+            s1 = sb.toString();
+            sb.setLength(0);
+            for (int a = bs.middle; a < bs.length; ++a) {
+                sb.append((char) bs.value[a]);
+            }
+            s2 = sb.toString();
+            fromString(s1, s2);
+        }
+
+        long hashcodelong;
+
+        public void fromString(String s1, String s2) {
+            this.s1 = s1;
+            this.s2 = s2;
+            middle = s1.length();
+            length = middle + s2.length();
+            hashcodelong = s1.hashCode() * powArray[length - middle] + s2.hashCode();
+        }
+
+        public int hashCode() {
+            return (int) (hashcodelong % 1000000007);
+        }
+
+        public boolean equals(Object obj) {
+            FastHashString fs = (FastHashString) obj;
+            return this.hashcodelong == fs.hashcodelong&& this.middle == fs.middle;
+//        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
+        }
+
+    }
     public KcodeAlertAnalysisImpl() {
         manager = new DataPrepareManager();
     }
@@ -142,6 +143,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 ansArray[i] = value.SRArray[j];
             }
         });
+//        HashAnalyzer.anslyze(fastHashMap);
         TimeRange doClash=new TimeRange();
         doClash.pointFirst();
         while(fasterHashMap.getHashClash()!=0 && doClash.firstTime()<1000){

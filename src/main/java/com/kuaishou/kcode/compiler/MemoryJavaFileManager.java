@@ -19,7 +19,7 @@ import javax.tools.SimpleJavaFileObject;
 /**
  * In-memory java file manager.
  * 
- * @author michael
+ *
  */
 class MemoryJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
 
