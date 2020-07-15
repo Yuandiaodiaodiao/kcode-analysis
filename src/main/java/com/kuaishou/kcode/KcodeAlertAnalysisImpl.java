@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     private DataPrepareManager manager;
-    static class HashString {
+    public static class HashString {
 
         public int length ;
         public int middle , s2length ;
@@ -68,8 +68,20 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             length = middle + s2length;
             doHash();
         }
-
+        static{
+            try {
+                Field f=String.class.getDeclaredField("value");
+                long offset=THE_UNSAFE.objectFieldOffset(f);
+                String aaa="124214124";
+                int a=THE_UNSAFE.getInt(aaa,offset);
+                int b=THE_UNSAFE.getInt(aaa,offset+4);
+                int c=1;
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }
         public void doHash() {
+
             hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();
             hashint=(int) (hashcodelong % 1000000007);
         }
@@ -143,6 +155,20 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public KcodeAlertAnalysisImpl() {
+
+        try {
+            Field f=String.class.getDeclaredField("value");
+            long offset=THE_UNSAFE.objectFieldOffset(f);
+            String aaa="12345678";
+            int a=THE_UNSAFE.getInt(aaa,offset);
+            char ccc=THE_UNSAFE.getChar(aaa,offset);
+            char cccd=THE_UNSAFE.getChar(aaa,offset+1);
+            byte cc=THE_UNSAFE.getByte(aaa,offset);
+            int b=THE_UNSAFE.getInt(aaa,offset+4);
+            int c=1;
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
         manager = new DataPrepareManager();
     }
 
@@ -167,7 +193,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
-        THE_UNSAFE.allocateMemory(10);
         TimeRange t1 = new TimeRange();
         manager.start(path, alertRules);
         manager.stop();
@@ -228,15 +253,32 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             newkey2.fromByteString(key);
             int timeIndex = maxMinute - firstMinute;
 
+
+            Field f= null;
+            try {
+                f = String.class.getDeclaredField("value");
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+//            long offset=THE_UNSAFE.objectFieldOffset(f);
+//            long offset2=THE_UNSAFE.arrayBaseOffset(char[].class);
+//            String aaa=newkey2.s1;
+//            char[] c=(char[])THE_UNSAFE.getObject(aaa,12);
+//            int a=THE_UNSAFE.getInt(c,offset2);
+//            char ccc=THE_UNSAFE.getChar(c,offset2);
+//            char cccd=THE_UNSAFE.getChar(c,offset2);
+//            byte cc=THE_UNSAFE.getByte(c,offset2);
+//            int b=THE_UNSAFE.getInt(c,offset2+4);
+
             Collection<String>[] ansArray = new ArrayList[(timeIndex + 2) * 2];
             fastHashMap.put(newkey2, ansArray);
 
             fasterHashMap.put(newkey2, ansArray);
             for (int i = 0; i < timeIndex + 2; ++i) {
-                ansArray[i] = value.P99Array[i];
+                ansArray[i] = value.SRArray[i];
             }
             for (int i = timeIndex + 2, j = 0; i < (timeIndex + 2) * 2; ++i, ++j) {
-                ansArray[i] = value.SRArray[j];
+                ansArray[i] = value.P99Array[j];
             }
         });
 //        HashAnalyzer.anslyze(fastHashMap);
@@ -366,7 +408,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
         fs.fromString(caller, responder);
-        return fastHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + getTime(time)];
+        return fastHashMap.get(fs)[(type.length()&1) * (timeIndex + 2) + getTime(time)];
 //        return realgetLongestPath(caller, responder, time, type);
 //        try {
 //            ch=(char[])stringField.get(time);

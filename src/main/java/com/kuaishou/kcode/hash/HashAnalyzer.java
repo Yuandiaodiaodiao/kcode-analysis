@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import com.kuaishou.kcode.KcodeAlertAnalysisImpl.HashString;
 public class HashAnalyzer {
-    public static void anslyze( HashMap<FashHashStringInterface, Collection<String>[]> fastHashMap){
+    public static int[] anslyze( HashMap<HashString, Collection<String>[]> fastHashMap){
         AtomicInteger minService1Len= new AtomicInteger(99999);
         AtomicInteger minService2Len= new AtomicInteger(99999);
         AtomicInteger service1LenAvg= new AtomicInteger();
@@ -28,10 +28,15 @@ public class HashAnalyzer {
         System.out.println("最小长度1="+minService1Len+"最小长度2="+minService2Len);
         System.out.println("平均长度1="+avg1+"最小长度2="+avg2);
         boolean canFront=frontUnique(minService1Len.get(),minService2Len.get(),fastHashMap);
-        if(canFront)return;
+        int [] bestarg=new int[4];
+
+        if(canFront){
+            bestarg[0]=minService1Len.get();
+            bestarg[1]=minService2Len.get();
+            return bestarg;
+        }
         TimeRange t=new TimeRange();
         int minUsed=99999;
-        int [] bestarg=new int[5];
         for(int front1=minService1Len.get();front1>=0;--front1){
             boolean success=false;
             for(int front2=minService2Len.get();front2>=0;--front2){
@@ -42,6 +47,14 @@ public class HashAnalyzer {
                         if(avg1+avg2<(front1+front2+back1+back2)){
                             //无意义 太长了
                             continue;
+                        }
+                        int tot=front1+front2+back1+back2;
+                        if(tot<minUsed){
+                            minUsed=tot;
+                            bestarg[0]=front1;
+                            bestarg[1]=front2;
+                            bestarg[2]=back1;
+                            bestarg[3]=back2;
                         }
                         boolean canFrontAndBack=frontAndBack(front1,front2,back1,back2,fastHashMap);
                         if(canFrontAndBack){
@@ -61,13 +74,13 @@ public class HashAnalyzer {
 
         System.out.println("不可哈希优化");
 
-
+        return bestarg;
 
     }
-    static boolean frontUnique(int minService1Len,int minService2Len,HashMap<FashHashStringInterface, Collection<String>[]> fastHashMap){
-        HashSet<KcodeAlertAnalysisImpl.FastHashString> hashMap2=new HashSet<>();
+    static boolean frontUnique(int minService1Len,int minService2Len,HashMap<HashString, Collection<String>[]> fastHashMap){
+        HashSet<HashString> hashMap2=new HashSet<>();
         fastHashMap.forEach((key,value)->{
-            KcodeAlertAnalysisImpl.FastHashString fs1=new KcodeAlertAnalysisImpl.FastHashString();
+            HashString fs1=new HashString();
             String news1=key.s1.substring(0,minService1Len);
             String news2=key.s2.substring(0,minService2Len);
             fs1.fromString(news1,news2);
@@ -79,10 +92,10 @@ public class HashAnalyzer {
         }
         return false;
     }
-    static boolean frontAndBack(int minService1Len,int minService2Len,int backlen1,int backlen2,HashMap<FashHashStringInterface, Collection<String>[]> fastHashMap){
-        HashSet<KcodeAlertAnalysisImpl.FastHashString> hashMap2=new HashSet<>();
+    static boolean frontAndBack(int minService1Len,int minService2Len,int backlen1,int backlen2,HashMap<HashString, Collection<String>[]> fastHashMap){
+        HashSet<HashString> hashMap2=new HashSet<>();
         fastHashMap.forEach((key,value)->{
-            KcodeAlertAnalysisImpl.FastHashString fs1=new KcodeAlertAnalysisImpl.FastHashString();
+            HashString fs1=new HashString();
             String news1=key.s1.substring(0,minService1Len);
             String news2=key.s2.substring(0,minService2Len);
             news1+=key.s1.substring(key.s1.length()-backlen1,key.s1.length());
