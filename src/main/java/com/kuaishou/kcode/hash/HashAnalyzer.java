@@ -27,12 +27,33 @@ public class HashAnalyzer {
         int avg2=service2LenAvg.get()/fastHashMap.keySet().size();
         System.out.println("最小长度1="+minService1Len+"最小长度2="+minService2Len);
         System.out.println("平均长度1="+avg1+"最小长度2="+avg2);
-        boolean canFront=frontUnique(minService1Len.get(),minService2Len.get(),fastHashMap);
+        int minUseda=99999;
         int [] bestarg=new int[4];
-        for(int a=0;a<3;++a){bestarg[a]=0;}
-        if(canFront){
-            bestarg[0]=minService1Len.get();
-            bestarg[1]=minService2Len.get();
+
+        for(int front1=minService1Len.get();front1>=0;--front1){
+            boolean success=false;
+            for(int front2=minService2Len.get();front2>=0;--front2){
+                boolean canFront=frontUnique(front1,front2,fastHashMap);
+                if(!canFront){
+                    break;
+                }else{
+                    success=true;
+                    int cost=front1+front2;
+                    if(cost<minUseda){
+                        minUseda=cost;
+                        bestarg[0]=front1;
+                        bestarg[1]=front2;
+                    }
+                }
+            }
+            if(success==false){
+                break;
+            }
+        }
+
+
+        if(minUseda<99999){
+            System.out.println("最优参数="+bestarg[0]+" "+bestarg[1]);
             return bestarg;
         }
         TimeRange t=new TimeRange();
@@ -92,7 +113,7 @@ public class HashAnalyzer {
             hashMap2.add(fs1);
         });
         if(hashMap2.size()==fastHashMap.keySet().size()){
-            System.out.println("可以按照前半部分最小长度哈希");
+//            System.out.println("可以按照前半部分最小长度哈希");
             return true;
         }
         return false;
