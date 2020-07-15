@@ -398,7 +398,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //                    int tt=getTime(timeFormat);
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "S");
-                    s = getLongestPath(key.s1, key.s2, timeFormat, "P");
+//                    s = getLongestPath(key.s1, key.s2, timeFormat, "P");
                     s = getLongestPath(key.s1, key.s2, timeFormat, "S");
                 }
             });
