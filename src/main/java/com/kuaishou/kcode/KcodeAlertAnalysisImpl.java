@@ -374,7 +374,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             fastestHashMap.put(newKey, value);
         });
         fastestHashMap.prepareReady();
-        System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
+        System.out.println("哈希冲突=" + fastestHashMap.getHashClash() + "/" + fastHashMap.size());
 
 
         TimeRange theat = new TimeRange();
