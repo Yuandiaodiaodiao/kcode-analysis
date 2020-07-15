@@ -259,7 +259,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fastHashMap = new HashMap<>(4096 * 1024);
         AnalyzeData.printMemoryInfo();
 
-        fasterHashMap = new FastHashMap<>(64 * 1024 * 1024);
+        fasterHashMap = new FastHashMap<>(20000);
         AnalyzeData.printMemoryInfo();
         fasterHashMap.mod = 10000;
 //        HashClassGenerator.test();
@@ -292,7 +292,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             Collection<String>[] ansArray = new ArrayList[(timeIndex + 2) * 2];
             fastHashMap.put(newkey2, ansArray);
 
-            fasterHashMap.put(newkey2, ansArray);
+//            fasterHashMap.put(newkey2, ansArray);
             for (int i = 0; i < timeIndex + 2; ++i) {
                 ansArray[i] = value.SRArray[i];
             }
@@ -315,45 +315,45 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
         //重新hash
         boolean finalCanBestHash = canBestHash;
-        if (finalCanBestHash) {
-            fasterHashMap.clear();
-            fastHashMap.forEach((key, value) -> {
-                HashString hs = new HashString();
-                if (finalCanBestHash) {
-                    hs.bestHash = 0;
-                    hs.HN1 = bestHash[0];
-                    hs.HN2 = bestHash[1];
-                    hs.HN3 = bestHash[2];
-                    hs.HN4 = bestHash[3];
-                }
-                hs.fromString(key.s1, key.s2);
-                fasterHashMap.put(hs, value);
-            });
-        }
+//        if (finalCanBestHash) {
+//            fasterHashMap.clear();
+//            fastHashMap.forEach((key, value) -> {
+//                HashString hs = new HashString();
+//                if (finalCanBestHash) {
+//                    hs.bestHash = 0;
+//                    hs.HN1 = bestHash[0];
+//                    hs.HN2 = bestHash[1];
+//                    hs.HN3 = bestHash[2];
+//                    hs.HN4 = bestHash[3];
+//                }
+//                hs.fromString(key.s1, key.s2);
+//                fasterHashMap.put(hs, value);
+//            });
+//        }
         TimeRange doClash = new TimeRange();
         int lastMod = 0;
-        while (fasterHashMap.getHashClash() != 0 && lastMod != fasterHashMap.mod) {
-            fasterHashMap.clear();
-            lastMod = fasterHashMap.mod;
-            fasterHashMap.remodbig();
-//            System.out.println("mod="+fasterHashMap.mod);
-            fastHashMap.forEach((key, value) -> {
-                if (finalCanBestHash) {
-                    HashString hs = new HashString();
-                    hs.bestHash = 0;
-                    hs.HN1 = bestHash[0];
-                    hs.HN2 = bestHash[1];
-                    hs.HN3 = bestHash[2];
-                    hs.HN4 = bestHash[3];
-                    hs.fromString(key.s1, key.s2);
-                    fasterHashMap.put(hs, value);
-                } else {
-                    fasterHashMap.put(key, value);
-                }
-
-            });
-//            System.out.println("remode"+fasterHashMap.mod);
-        }
+//        while (fasterHashMap.getHashClash() != 0 && lastMod != fasterHashMap.mod) {
+//            fasterHashMap.clear();
+//            lastMod = fasterHashMap.mod;
+//            fasterHashMap.remodbig();
+////            System.out.println("mod="+fasterHashMap.mod);
+//            fastHashMap.forEach((key, value) -> {
+//                if (finalCanBestHash) {
+//                    HashString hs = new HashString();
+//                    hs.bestHash = 0;
+//                    hs.HN1 = bestHash[0];
+//                    hs.HN2 = bestHash[1];
+//                    hs.HN3 = bestHash[2];
+//                    hs.HN4 = bestHash[3];
+//                    hs.fromString(key.s1, key.s2);
+//                    fasterHashMap.put(hs, value);
+//                } else {
+//                    fasterHashMap.put(key, value);
+//                }
+//
+//            });
+////            System.out.println("remode"+fasterHashMap.mod);
+//        }
 
 
         doClash.point();
@@ -431,13 +431,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        String s=AnalyzeData.printMemoryInfo();
 //        Utils.getAnswer1Type(ans);
 
 
-//        if (DistributeBufferThread.baseMinuteTime > 0) {
-//            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size());
-//        }
+        if (DistributeBufferThread.baseMinuteTime > 0) {
+            String s=AnalyzeData.printMemoryInfo();
+
+            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+fastestHashMap.mod);
+        }
         return ans;
     }
 
