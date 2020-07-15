@@ -29,7 +29,7 @@ public class HashAnalyzer {
         System.out.println("平均长度1="+avg1+"最小长度2="+avg2);
         boolean canFront=frontUnique(minService1Len.get(),minService2Len.get(),fastHashMap);
         int [] bestarg=new int[4];
-
+        for(int a=0;a<3;++a){bestarg[a]=0;}
         if(canFront){
             bestarg[0]=minService1Len.get();
             bestarg[1]=minService2Len.get();
@@ -49,18 +49,19 @@ public class HashAnalyzer {
                             continue;
                         }
                         int tot=front1+front2+back1+back2;
-                        if(tot<minUsed){
-                            minUsed=tot;
-                            bestarg[0]=front1;
-                            bestarg[1]=front2;
-                            bestarg[2]=back1;
-                            bestarg[3]=back2;
-                        }
+
                         boolean canFrontAndBack=frontAndBack(front1,front2,back1,back2,fastHashMap);
                         if(canFrontAndBack){
-                            System.out.println("找到哈希"+front1+"~"+back1+" "+front2+"~"+back2);
+                            if(tot<minUsed){
+                                minUsed=tot;
+                                bestarg[0]=front1;
+                                bestarg[1]=front2;
+                                bestarg[2]=back1;
+                                bestarg[3]=back2;
+                            }
+//                            System.out.println("找到哈希"+front1+"~"+back1+" "+front2+"~"+back2);
                             t.pointFirst();
-                            t.output("fandb找到 耗时=");
+//                            t.output("fandb找到 耗时=");
                             success=true;
 //                    return;
                         }
@@ -71,10 +72,14 @@ public class HashAnalyzer {
                 break;
             }
         }
+        if(minUsed==99999){
+            System.out.println("不可哈希优化");
+            return null;
+        }else{
 
-        System.out.println("不可哈希优化");
+            return bestarg;
+        }
 
-        return bestarg;
 
     }
     static boolean frontUnique(int minService1Len,int minService2Len,HashMap<HashString, Collection<String>[]> fastHashMap){
@@ -104,7 +109,7 @@ public class HashAnalyzer {
             hashMap2.add(fs1);
         });
         if(hashMap2.size()==fastHashMap.keySet().size()){
-            System.out.println("可以按照前半部分加后半部分最小长度哈希");
+//            System.out.println("可以按照前半部分加后半部分最小长度哈希");
             return true;
         }
         return false;

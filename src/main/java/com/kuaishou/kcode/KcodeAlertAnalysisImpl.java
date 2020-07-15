@@ -4,6 +4,7 @@ import com.kuaishou.kcode.compiler.CompilerTest;
 import com.kuaishou.kcode.hash.FashHashStringInterface;
 import com.kuaishou.kcode.hash.HashAnalyzer;
 import com.kuaishou.kcode.hash.HashClassGenerator;
+import jdk.nashorn.internal.objects.NativeInt8Array;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -24,18 +25,25 @@ import java.util.HashMap;
 
 public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     private DataPrepareManager manager;
+
     public static class HashString {
 
-        public int length ;
-        public int middle , s2length ;
-        public String s1 , s2 ;
+        public int length;
+        public int middle, s2length;
+        public String s1, s2;
         public static long[] powArray;
         public long hashcodelong;
         public int hashint;
+        public int bestHash = 1;
+        public int HN1;
+        public int HN2;
+        public int HN3;
+        public int HN4;
+
         static {
-            powArray = new long[256];
+            powArray = new long[128];
             powArray[0] = 1;
-            for (int a = 1; a <= 200; ++a) {
+            for (int a = 1; a < 128; ++a) {
                 powArray[a] = powArray[a - 1] * 31;
             }
         }
@@ -63,27 +71,34 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         public void fromString(String s1, String s2) {
             this.s1 = s1;
             this.s2 = s2;
-            middle = s1.length();
-            s2length = s2.length();
-            length = middle + s2length;
-            doHash();
-        }
-        static{
-            try {
-                Field f=String.class.getDeclaredField("value");
-                long offset=THE_UNSAFE.objectFieldOffset(f);
-                String aaa="124214124";
-                int a=THE_UNSAFE.getInt(aaa,offset);
-                int b=THE_UNSAFE.getInt(aaa,offset+4);
-                int c=1;
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            if (bestHash == 0) {
+                char[] c1 = (char[]) THE_UNSAFE.getObject(s1, 12);
+                char[] c2 = (char[]) THE_UNSAFE.getObject(s2, 12);
+                hashcodelong=0;
+                for (int a = 0; a < HN1; ++a) {
+                    hashcodelong = c1[a] + hashcodelong * 31;
+                }
+                middle = c1.length;
+                for (int a = middle - HN3; a < middle; ++a) {
+                    hashcodelong = c1[a] + hashcodelong * 31;
+                }
+                for (int a = 0; a < HN2; ++a) {
+                    hashcodelong = c2[a] + hashcodelong * 31;
+                }
+                s2length = c2.length;
+                for (int a = s2length - HN4; a < s2length; ++a) {
+                    hashcodelong = c2[a] + hashcodelong * 31;
+                }
+                length = middle + s2length;
+                hashint = (int) (hashcodelong % 1000000007);
+            } else {
+                middle = s1.length();
+                s2length = s2.length();
+                length = middle + s2length;
+                hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();
+                hashint = (int) (hashcodelong % 1000000007);
             }
-        }
-        public void doHash() {
 
-            hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();
-            hashint=(int) (hashcodelong % 1000000007);
         }
 
         public int hashCode() {
@@ -97,6 +112,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
 
     }
+
     public static class FastHashString extends FashHashStringInterface {
 
 
@@ -157,15 +173,15 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public KcodeAlertAnalysisImpl() {
 
         try {
-            Field f=String.class.getDeclaredField("value");
-            long offset=THE_UNSAFE.objectFieldOffset(f);
-            String aaa="12345678";
-            int a=THE_UNSAFE.getInt(aaa,offset);
-            char ccc=THE_UNSAFE.getChar(aaa,offset);
-            char cccd=THE_UNSAFE.getChar(aaa,offset+1);
-            byte cc=THE_UNSAFE.getByte(aaa,offset);
-            int b=THE_UNSAFE.getInt(aaa,offset+4);
-            int c=1;
+            Field f = String.class.getDeclaredField("value");
+            long offset = THE_UNSAFE.objectFieldOffset(f);
+            String aaa = "12345678";
+            int a = THE_UNSAFE.getInt(aaa, offset);
+            char ccc = THE_UNSAFE.getChar(aaa, offset);
+            char cccd = THE_UNSAFE.getChar(aaa, offset + 1);
+            byte cc = THE_UNSAFE.getByte(aaa, offset);
+            int b = THE_UNSAFE.getInt(aaa, offset + 4);
+            int c = 1;
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -175,7 +191,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     HashMap<HashString, Collection<String>[]> fastHashMap;
     FastHashMap<HashString, Collection<String>[]> fasterHashMap;
     private static final Unsafe THE_UNSAFE;
-    static{
+
+    static {
         try {
             final PrivilegedExceptionAction<Unsafe> action = new PrivilegedExceptionAction<Unsafe>() {
                 public Unsafe run() throws Exception {
@@ -185,11 +202,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 }
             };
             THE_UNSAFE = AccessController.doPrivileged(action);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Unable to load unsafe", e);
         }
     }
+
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
@@ -244,17 +261,17 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         AnalyzeData.printMemoryInfo();
         fasterHashMap.mod = 10;
         HashClassGenerator.test();
-        fs =new HashString();
+        fs = new HashString();
         Q2Answer.forEach((key, value) -> {
 //            FastHashString newkey = new FastHashString();
 //            newkey.fromByteString(key);
 //            FashHashStringInterface newkey2 = HashClassGenerator.getInstance(key);
-            HashString newkey2=new HashString();
+            HashString newkey2 = new HashString();
             newkey2.fromByteString(key);
             int timeIndex = maxMinute - firstMinute;
 
 
-            Field f= null;
+            Field f = null;
             try {
                 f = String.class.getDeclaredField("value");
             } catch (NoSuchFieldException e) {
@@ -281,18 +298,66 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 ansArray[i] = value.P99Array[j];
             }
         });
-//        HashAnalyzer.anslyze(fastHashMap);
+        int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
+        boolean canBestHash = false;
+        if(bestHash!= null){
+            canBestHash=true;
+        }
+        if (canBestHash) {
+            fs.bestHash = 0;
+            fs.HN1 = bestHash[0];
+            fs.HN2 = bestHash[1];
+            fs.HN3 = bestHash[2];
+            fs.HN4 = bestHash[3];
+        }
+        //重新hash
+        boolean finalCanBestHash = canBestHash;
+        if (finalCanBestHash) {
+            fasterHashMap.clear();
+            fastHashMap.forEach((key, value) -> {
+                HashString hs = new HashString();
+                if (finalCanBestHash) {
+                    hs.bestHash = 0;
+                    hs.HN1 = bestHash[0];
+                    hs.HN2 = bestHash[1];
+                    hs.HN3 = bestHash[2];
+                    hs.HN4 = bestHash[3];
+                }
+                hs.fromString(key.s1, key.s2);
+                fasterHashMap.put(hs, value);
+            });
+        }
         TimeRange doClash = new TimeRange();
         doClash.pointFirst();
-        while (fasterHashMap.getHashClash() != 0 && doClash.firstTime() < 1000) {
+        int lastMod=0;
+        while (fasterHashMap.getHashClash() != 0 && lastMod!=fasterHashMap.mod) {
             fasterHashMap.clear();
+            lastMod=fasterHashMap.mod;
             fasterHashMap.remodbig();
+//            System.out.println("mod="+fasterHashMap.mod);
             fastHashMap.forEach((key, value) -> {
-                fasterHashMap.put(key, value);
+                if (finalCanBestHash) {
+                    HashString hs = new HashString();
+                    hs.bestHash = 0;
+                    hs.HN1 = bestHash[0];
+                    hs.HN2 = bestHash[1];
+                    hs.HN3 = bestHash[2];
+                    hs.HN4 = bestHash[3];
+                    hs.fromString(key.s1, key.s2);
+                    fasterHashMap.put(hs, value);
+                } else {
+                    fasterHashMap.put(key, value);
+                }
+
             });
 //            System.out.println("remode"+fasterHashMap.mod);
             doClash.pointFirst();
         }
+
+
+
+
+
         doClash.point();
         doClash.output("解决哈希冲突");
         System.out.println(doClash.firstTime());
@@ -309,11 +374,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         timeIndex = maxMinute - firstMinute;
 
         if (true) {
-            final int[] heatTimes = {100000};
+            final int[] heatTimes = {1499};
             String timeFormat = format.format(new Date((maxMinute - firstMinute) / 2 * 60000L));
             fastHashMap.forEach((key, value) -> {
                 Collection<String> s;
-                while (heatTimes[0] >0){
+                while (heatTimes[0] > 0) {
                     heatTimes[0]--;
 //                    int tt=getTime(timeFormat);
 //                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
@@ -394,21 +459,17 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public int getTime(String time) {
 //        int t12 = time.charAt(12);
 //        int t14 = time.charAt(14);
-        int t = prepareTime + time.charAt(11) * 600 + time.charAt(12)*60 + time.charAt(14)*10 + time.charAt(15);
+        int t = prepareTime + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15);
         t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
         return t;
     }
 
-    public Collection<String> realgetLongestPath(String caller, String responder, String time, String type) {
-        fs.fromString(caller, responder);
-        int t=getTime(time);
-        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
-    }
+
 
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
         fs.fromString(caller, responder);
-        return fastHashMap.get(fs)[(type.length()&1) * (timeIndex + 2) + getTime(time)];
+        return fasterHashMap.get(fs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
 //        return realgetLongestPath(caller, responder, time, type);
 //        try {
 //            ch=(char[])stringField.get(time);
