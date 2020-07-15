@@ -4,9 +4,12 @@ import com.kuaishou.kcode.compiler.CompilerTest;
 import com.kuaishou.kcode.hash.FashHashStringInterface;
 import com.kuaishou.kcode.hash.HashAnalyzer;
 import com.kuaishou.kcode.hash.HashClassGenerator;
+import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -145,10 +148,26 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     HashMap<HashString, Collection<String>[]> fastHashMap;
     FastHashMap<HashString, Collection<String>[]> fasterHashMap;
-
+    private static final Unsafe THE_UNSAFE;
+    static{
+        try {
+            final PrivilegedExceptionAction<Unsafe> action = new PrivilegedExceptionAction<Unsafe>() {
+                public Unsafe run() throws Exception {
+                    Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+                    theUnsafe.setAccessible(true);
+                    return (Unsafe) theUnsafe.get(null);
+                }
+            };
+            THE_UNSAFE = AccessController.doPrivileged(action);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Unable to load unsafe", e);
+        }
+    }
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
+        THE_UNSAFE.allocateMemory(10);
         TimeRange t1 = new TimeRange();
         manager.start(path, alertRules);
         manager.stop();
@@ -347,7 +366,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
         fs.fromString(caller, responder);
-        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + getTime(time)];
+        return fastHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + getTime(time)];
 //        return realgetLongestPath(caller, responder, time, type);
 //        try {
 //            ch=(char[])stringField.get(time);
