@@ -498,9 +498,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public int getTime(String time) {
 //        int t12 = time.charAt(12);
 //        int t14 = time.charAt(14);
-        int t = prepareTime + time.charAt(11) * 600 + time.charAt(12) * 60 + time.charAt(14) * 10 + time.charAt(15);
-        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
-        return t;
+        char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
+        int t = prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
+//        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
+        return t&0x7F;
     }
 
     public int getTypeHash(String type, String time) {
