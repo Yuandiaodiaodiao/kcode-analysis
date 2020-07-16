@@ -6,6 +6,8 @@ import com.kuaishou.kcode.compiler.CompilerTest;
 import com.kuaishou.kcode.compiler.User;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class HashClassGenerator {
     static long[] powArray = new long[256];
@@ -21,8 +23,9 @@ public class HashClassGenerator {
 
     }
 
-    public static Class<?> generateHashCoder(int[] args) {
+    public static Class<?> generateHashCoder(int[] args, HashMap<KcodeAlertAnalysisImpl.HashString, Collection<String>[]> fastHashMap) {
 
+        HashAnalyzer.fourArray farray=HashAnalyzer.tryDeletePoint(args,fastHashMap);
 
         StringBuilder b = new StringBuilder();
         b.append("   public int fromString(String s1, String s2) {\n");
