@@ -185,6 +185,7 @@ public class HashMapMergeThread extends Thread {
             }
 
             HashMap<ByteString, HashMap<Long, SingleIpPayload>> serviceMap = t.timeNameIpStore[timeIndex];
+            t.timeNameIpStore[timeIndex]=null;
             if (serviceMap == null) continue;
 
             serviceMap.forEach((key, value) -> {
