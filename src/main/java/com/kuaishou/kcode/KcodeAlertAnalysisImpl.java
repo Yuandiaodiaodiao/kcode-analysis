@@ -500,11 +500,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 //        Utils.getAnswer1Type(ans);
 
-//        if (DistributeBufferThread.baseMinuteTime > 0) {
-//            String s=AnalyzeData.printMemoryInfo();
-//
-//            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+mod);
-//        }
+        if (DistributeBufferThread.baseMinuteTime > 0) {
+            String s=AnalyzeData.printMemoryInfo();
+
+            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+mod);
+        }
         return ans;
     }
 
