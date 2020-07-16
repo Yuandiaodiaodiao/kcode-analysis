@@ -165,7 +165,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
 
     }
-
     static SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public KcodeAlertAnalysisImpl() {
@@ -195,8 +194,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     Class<?> finalClass;
     Collection<String>[] bucket;
     int mod;
-    int hashState = 0;
-
+    int hashState=0;
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
@@ -211,7 +209,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
         System.out.println("time个数=" + (maxMinute - firstMinute));
-        Q2Answer = manager.prepareQ2();
+        Q2Answer=manager.prepareQ2();
         t2.point();
 
         fastHashMap = new HashMap<>(4096 * 1024);
@@ -231,7 +229,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
-        bestHash = null;
+        bestHash=null;
         boolean canBestHash = false;
         if (bestHash != null) {
             canBestHash = true;
@@ -241,11 +239,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         doClash.point();
         doClash.output("解决哈希冲突");
 
-        if (canBestHash) {
-            this.hashState = 1;
-        } else {
+        if(canBestHash){
+            this.hashState=1;
+        }else{
             //原生哈希
-            this.hashState = 0;
+            this.hashState=0;
         }
 
         int mod = 20000;
@@ -259,7 +257,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
-        fastestHashMap.mod = 4096 - 1;
+        fastestHashMap.mod = 4096-1;
 
         doClash = new TimeRange();
         lastMod = 0;
@@ -270,13 +268,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             fastestHashMap.remodbig();
 //            System.out.println("mod="+fasterHashMap.mod);
             fastHashMap.forEach((key, value) -> {
-                if (this.hashState == 0) {
+                if(this.hashState==0){
                     int hash = getStringHash(key.s1, key.s2);
-                    hash = hash & fastestHashMap.mod;
+                    hash=hash&fastestHashMap.mod;
                     fastestHashMap.put(ffs, value, hash);
-                } else {
+                }else{
                     int hash = ffs.fromString(key.s1, key.s2);
-                    hash = hash & fastestHashMap.mod;
+                    hash=hash&fastestHashMap.mod;
                     fastestHashMap.put(ffs, value, hash);
                 }
 
@@ -310,9 +308,9 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
             int hash = newKey.fromString(key.s1, key.s2);
-            if (this.hashState == 0) {
+            if(this.hashState==0){
                 //原生哈希
-                hash = getStringHash(key.s1, key.s2);
+             hash=getStringHash(key.s1,key.s2);
             }
             int timeIndex = maxMinute - firstMinute;
             for (int i = 0; i < timeIndex + 2; ++i) {
@@ -341,7 +339,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         prepareTime = solvePrepareTime(firstMinute);
         timeIndex = maxMinute - firstMinute;
 //预热
-        System.out.println("hashstate=" + this.hashState);
+        System.out.println("hashstate="+this.hashState);
         System.out.println("开始预热");
         if (true) {
             final int[] heatTimes = {1499000};
@@ -359,6 +357,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         theat.point();
         theat.output("预热耗时");
+
 
 
 //        Utils.getAnswer1Type(ans);
@@ -411,13 +410,12 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
 
     int timeIndex;
-
-    public int solvePrepareTime(int firstMinute) {
+    public int solvePrepareTime(int firstMinute){
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String starttimeFormat = format.format(new Date(firstMinute * 60000L));
         int y = 55348 - starttimeFormat.charAt(0) * 1000 - starttimeFormat.charAt(1) * 100 - starttimeFormat.charAt(2) * 10 - starttimeFormat.charAt(3);
         int M = starttimeFormat.charAt(5) * 10 + starttimeFormat.charAt(6) - 528;
-        int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528 + starttimeFormat.charAt(11) * 600 - firstMinute;
+        int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528+starttimeFormat.charAt(11)*600 - firstMinute;
         return t;
     }
 
@@ -427,7 +425,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public int getTypeHash(String type, String time) {
-        return (getTime(time) << 1) + ((type.length() & 1));
+        return (getTime(time)<<1) + ((type.length() & 1));
     }
 
     public int getFinalHash(int hash1, int hash2) {
@@ -435,19 +433,15 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public int getStringHash(String caller, String responder) {
-        int hashcodeA = caller.hashCode();
-        return (hashcodeA << 5) - hashcodeA + responder.hashCode();
+        int hashcodeA=caller.hashCode();
+        return (hashcodeA<<5)-hashcodeA + responder.hashCode();
     }
-
-    public int solveAll(String caller, String responder, String time, String type) {
-        int hashcodeA = caller.hashCode();
-        char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
-        return (((((hashcodeA << 5) - hashcodeA + responder.hashCode())) & mod) << 8) + (((prepareTime + c1[12] * 60 + c1[14] * 10 + c1[15]) << 1 )+ (type.length() & 1));
-    }
-
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-        return bucket[solveAll(caller, responder, time, type)];
+        int hashi=getStringHash(caller,responder);
+        int typebit = getTypeHash(type, time);
+        int index = getFinalHash(hashi, typebit);
+        return bucket[index];
     }
 
 
