@@ -1,6 +1,11 @@
 package com.kuaishou.kcode.hash;
 
+import com.kuaishou.kcode.ByteString;
+import com.kuaishou.kcode.KcodeAlertAnalysisImpl;
 import com.kuaishou.kcode.compiler.CompilerTest;
+import com.kuaishou.kcode.compiler.User;
+
+import java.lang.reflect.Method;
 
 public class HashClassGenerator {
     static long[] powArray = new long[256];

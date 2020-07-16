@@ -1,6 +1,7 @@
 package com.kuaishou.kcode.hash;
 
-import com.kuaishou.kcode.KcodeAlertAnalysis;
+import com.kuaishou.kcode.ByteString;
+import com.kuaishou.kcode.KcodeAlertAnalysisImpl;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -85,7 +86,7 @@ public class HardHashImpl  implements HardHashInterface{
     }
 
     public boolean equals(Object obj) {
-        return this.hashcodelong == ((KcodeAlertAnalysis.HashString) obj).hashcodelong;
+        return this.hashcodelong == ((KcodeAlertAnalysisImpl.HashString) obj).hashcodelong;
 //            return this.hashcodelong == ((HashString) obj).hashcodelong && this.middle == ((HashString) obj).middle;
 //        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
     }
