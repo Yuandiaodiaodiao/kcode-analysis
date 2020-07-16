@@ -165,6 +165,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         }
 
     }
+    static SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public KcodeAlertAnalysisImpl() {
 
@@ -215,20 +216,16 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         TimeRange t1 = new TimeRange();
         manager.start(path, alertRules);
         manager.stop();
-
-        ArrayList<String> ans = manager.getAnswer1();
-        TimeRange t2 = new TimeRange();
-
         t1.point();
-        firstMinute = manager.mergeThread.firstMinute;
+        t1.output("read 耗时");
+        ArrayList<String> ans = manager.getAnswer1();
 
-        manager.prepareQ2();
-
-        t2.point();
+        TimeRange t2 = new TimeRange();
         firstMinute = manager.mergeThread.firstMinute;
         maxMinute = manager.mergeThread.maxMinute;
         System.out.println("time个数=" + (maxMinute - firstMinute));
-        Q2Answer = manager.Q2Answer;
+        Q2Answer=manager.prepareQ2();
+        t2.point();
 
         fastHashMap = new HashMap<>(4096 * 1024);
 //        AnalyzeData.printMemoryInfo();
@@ -237,7 +234,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        AnalyzeData.printMemoryInfo();
 //        fasterHashMap.mod = 20000;
 //        HashClassGenerator.test();
-        fs = new HashString();
         Q2Answer.forEach((key, value) -> {
 //            FastHashString newkey = new FastHashString();
 //            newkey.fromByteString(key);
@@ -373,27 +369,19 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         this.mod = mod;
         TimeRange theat = new TimeRange();
         System.gc();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        String starttimeFormat = format.format(new Date(firstMinute * 60000L));
-        int y = 55348 - starttimeFormat.charAt(0) * 1000 - starttimeFormat.charAt(1) * 100 - starttimeFormat.charAt(2) * 10 - starttimeFormat.charAt(3);
-        int M = starttimeFormat.charAt(5) * 10 + starttimeFormat.charAt(6) - 528;
-        int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528 - firstMinute;
-        prepareTime = t;
+
+        prepareTime = solvePrepareTime(firstMinute);
         timeIndex = maxMinute - firstMinute;
 //预热
         System.out.println("hashstate="+this.hashState);
         System.out.println("开始预热");
         if (true) {
             final int[] heatTimes = {1499000};
-            String timeFormat = format.format(new Date((maxMinute - firstMinute) / 2 * 60000L));
+            String timeFormat = DATA_FORMAT.format(new Date((maxMinute + firstMinute) / 2 * 60000L));
             fastHashMap.forEach((key, value) -> {
                 Collection<String> s;
                 while (heatTimes[0] > 0) {
                     heatTimes[0]--;
-//                    s=getLongestPath2(key.s1, key.s2, timeFormat, "P");
-//                    int tt=getTime(timeFormat);
-//                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "P");
-//                    s=realgetLongestPath(key.s1, key.s2, timeFormat, "S");
                     s = getLongestPath(key.s1, key.s2, timeFormat, "P");
                     s = getLongestPath(key.s1, key.s2, timeFormat, "S");
                 }
@@ -403,10 +391,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         theat.point();
         theat.output("预热耗时");
-        t2.point();
-//        t2.output("Q2耗时");
-        t1.point();
-        t1.output("read 耗时");
+
 
 
 //        Utils.getAnswer1Type(ans);
@@ -457,23 +442,24 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     HardHashInterface ffs;
-    HashString fs;
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
-    public static long tttt;
-    public static long tttt2;
+
     int timeIndex;
+    public int solvePrepareTime(int firstMinute){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String starttimeFormat = format.format(new Date(firstMinute * 60000L));
+        int y = 55348 - starttimeFormat.charAt(0) * 1000 - starttimeFormat.charAt(1) * 100 - starttimeFormat.charAt(2) * 10 - starttimeFormat.charAt(3);
+        int M = starttimeFormat.charAt(5) * 10 + starttimeFormat.charAt(6) - 528;
+        int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528 - firstMinute;
+        return t;
+    }
 
     public int getTime(String time) {
-//        int t12 = time.charAt(12);
-//        int t14 = time.charAt(14);
         char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
-        //        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
         return prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
     }
 
     public int getTypeHash(String type, String time) {
-//        int timebit = getTime(time);
-//        int typebit = (type.length() & 1);
         return (getTime(time)) + ((type.length() & 1) << 7);
     }
 
@@ -484,58 +470,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public int getStringHash(String caller, String responder) {
         return caller.hashCode() * 31 + responder.hashCode();
     }
-
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
         int hashi=getStringHash(caller,responder);
-//        if(this.hashState==0){
-//            hashi
-//        }else{
-//            hashi=ffs.fromString(caller, responder);
-//        }
-        //time最大126来计算 是7bit
-        //0是SR 1是p99
         int typebit = getTypeHash(type, time);
         int index = getFinalHash(hashi, typebit);
         return bucket[index];
     }
 
-    public Collection<String> getLongestPath3(String caller, String responder, String time, String type) {
-        int hashi = ffs.fromString(caller, responder);
-        //time最大126来计算 是7bit
-        //0是SR 1是p99
-        int typebit = getTypeHash(type, time);
-        return strAndTimeHashMap.get8bit(hashi, typebit);
-    }
 
-    public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {
-        fs.fromString(caller, responder);
-        return fasterHashMap.get(fs)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
-//        return realgetLongestPath(caller, responder, time, type);
-//        try {
-//            ch=(char[])stringField.get(time);
-//        } catch (IllegalAccessException e) {
-//
-//        }
-//        int y = 55348 - time.charAt(0) * 1000 - time.charAt(1) * 100 - time.charAt(2) * 10 - time.charAt(3);
-//        int M = time.charAt(5) * 10 + time.charAt(6) - 528;
-//        int t = timeArray[y][M] + time.charAt(8) * 14400 + time.charAt(9) * 1440 - 792528  - firstMinute;
-//        int t12 = time.charAt(12);
-//        int t14 = time.charAt(14);
-//
-//        int t = prepareTime + time.charAt(11) * 600 + (t12 << 6) - (t12 << 2) + (t14 << 3) + (t14 << 1) + time.charAt(15);
-//        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
-//
-//        fs.fromString(caller, responder);
-//        bs.fromString(caller, responder);
-//        System.out.println("index="+);
-//        System.out.println("pos="+pos+" "+type.charAt(0));
-
-//        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
-//        return fasterHashMap.get(fs)[((type.charAt(0) - 'P') >> 1) * (timeIndex + 2) + t];
-//        return Q2Answer.get(bs).ansArray[(type.charAt(0)-'P')][t];
-//                    an=type.charAt(0) == 'S'?ans.SRArray[t]:ans.P99Array[t];
-//        return an;
-
-    }
 }

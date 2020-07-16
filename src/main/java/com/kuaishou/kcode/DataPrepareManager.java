@@ -82,7 +82,7 @@ public class DataPrepareManager {
         }
     }
     HashMap<ByteString, DAGPrepare.AnswerStructure> Q2Answer;
-    public void prepareQ2(){
+    public HashMap<ByteString, DAGPrepare.AnswerStructure>  prepareQ2(){
         DAGPrepare dag=new DAGPrepare(mergeThread.firstMinute);
         int firstM = mergeThread.firstMinute;
         int maxM = mergeThread.maxMinute;
@@ -96,13 +96,11 @@ public class DataPrepareManager {
             int firstMinute = mergeThread.firstMinute;
             int maxMinute = mergeThread.maxMinute;
             dag.generateAnswer(firstMinute,maxMinute);
-            Q2Answer=dag.Q2Answer;
+            return dag.Q2Answer;
 
         }catch (OutOfMemoryError e){
-//            System.out.println(e.getCause());
         throw new ArrayIndexOutOfBoundsException("OOM"+(maxM-firstM));
         }
-
     }
     public ArrayList<String>getAnswer1(){
         return mergeThread.warningList;
