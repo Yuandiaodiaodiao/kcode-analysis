@@ -89,13 +89,16 @@ public class FastHashMap<K, V> {
     public int getHashClash() {
         return clashNum;
     }
-    public V get(int i){
-        return (V) bucket[((i<<1)>>>1)%mod].value;
+    public V get8bit(int hash1,int hash2){
+       return (V)bucket[((((hash1<<1)>>>1)%mod)<<8)+(hash2&0xFF)].value;
+    }
+    public V get(int hash){
+        return (V) bucket[((hash<<1)>>>1)%mod].value;
     }
     public V get(K key) {
 
         int hash = key.hashCode();
-        Node<K, V> p = bucket[((hash<<1)>>>1) % mod];
+        Node<K, V> p = bucket[((hash<<1)>>>1)%mod];
         //取出节点p
 //        if (p == null) return null;
 
@@ -113,14 +116,46 @@ public class FastHashMap<K, V> {
         }
 
     }
+    public V put8bit(K key,V value,int hash1,int hash2){
+        int abshash =((((hash1<<1)>>>1)%mod)<<8)+(hash2&0xFF);
+        Node<K, V> p = bucket[abshash];
+        //没有就直接放
+        if (p == null) {
+            bucket[abshash] = new Node<>(key, value);
+            return value;
+        }
+        //有的话顺着next找到一样的
+        Node<K, V> lastp = null;
+
+
+        while (p != null) {
+
+            if (p.hash != hash1 || !p.key.equals(key)) {
+                //如果不一样就找下一个
+                lastp = p;
+                p = p.next;
+            } else {
+                //一样了就修改
+                p.key = key;
+                p.value = value;
+                p.hash = hash1;
+                return p.value;
+            }
+        }
+        //整个链表上都没有
+
+        clashNum++;
+        lastp.next = new Node<>(key, value);
+        return lastp.next.value;
+    }
 
     public V put(K key, V value) {
         int hash = key.hashCode();
-        int abshash =((hash<<1)>>>1);
-        Node<K, V> p = bucket[abshash % mod];
+        int abshash =((hash<<1)>>>1)%mod;
+        Node<K, V> p = bucket[abshash];
         //没有就直接放
         if (p == null) {
-            bucket[abshash % mod] = new Node<>(key, value);
+            bucket[abshash] = new Node<>(key, value);
             return value;
         }
         //有的话顺着next找到一样的
