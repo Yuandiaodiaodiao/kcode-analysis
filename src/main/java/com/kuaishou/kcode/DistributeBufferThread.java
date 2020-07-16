@@ -82,8 +82,8 @@ public class DistributeBufferThread extends Thread{
             }
             //要让每个线程都coutdown一下
             CountDownLatch countdown=new CountDownLatch(1);
-            countDownQueue.offer(new BufferWithLatch(countdown,-1,lastMinuteTime+7));
-            latchArray.add(new BufferWithLatch(countdown,-1,lastMinuteTime+7));
+            countDownQueue.offer(new BufferWithLatch(countdown,-1,lastMinuteTime+8));
+            latchArray.add(new BufferWithLatch(countdown,-1,lastMinuteTime+8));
             //通过id==-1结束rawbaffer处理线程
             unsolvedBuffer.offer(new BufferWithLatch(countdown,-1,-1));
 
