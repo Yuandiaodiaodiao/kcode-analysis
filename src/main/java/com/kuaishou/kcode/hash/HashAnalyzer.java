@@ -196,7 +196,7 @@ ArrayList<Integer>backup;
                 } else {
                     success = true;
                     int cost = front1 + front2;
-                    if (cost < minUseda) {
+                    if (cost < minUseda && cost<avg1+avg1-5) {
                         minUseda = cost;
                         bestarg[0] = front1;
                         bestarg[1] = front2;
@@ -246,7 +246,7 @@ ArrayList<Integer>backup;
                     if (success == true) break;
                     for (int back2 = 0; back2 <= minService2Len.get(); ++back2) {
                         if (success == true) break;
-                        if (avg1 + avg2 < (front1 + front2 + back1 + back2)) {
+                        if (avg1 + avg2-5 < (front1 + front2 + back1 + back2)) {
                             //无意义 太长了
                             continue;
                         }

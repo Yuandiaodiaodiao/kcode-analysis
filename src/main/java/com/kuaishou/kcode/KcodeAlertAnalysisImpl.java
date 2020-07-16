@@ -208,7 +208,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     FastHashMap<HardHashInterface, Collection<String>> strAndTimeHashMap;
     Collection<String>[] bucket;
     int mod;
-
+    int hashState=0;
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
@@ -302,7 +302,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
 
-        bestHash = null;
         boolean canBestHash = false;
         if (bestHash != null) {
             canBestHash = true;
@@ -311,6 +310,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         int lastMod = 0;
         doClash.point();
         doClash.output("解决哈希冲突");
+
+        if(canBestHash){
+            this.hashState=1;
+        }else{
+            //原生哈希
+            this.hashState=0;
+        }
 
         int mod = 20000;
         fasterHashMap = null;
@@ -334,8 +340,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             fastestHashMap.remodbig();
 //            System.out.println("mod="+fasterHashMap.mod);
             fastHashMap.forEach((key, value) -> {
-                int hash = ffs.fromString(key.s1, key.s2);
-                fastestHashMap.put(ffs, value, hash);
+                if(this.hashState==0){
+                    int hash = getStringHash(key.s1, key.s2);
+                    fastestHashMap.put(ffs, value, hash);
+                }else{
+                    int hash = ffs.fromString(key.s1, key.s2);
+                    fastestHashMap.put(ffs, value, hash);
+                }
 
             });
 //            System.out.println("remode"+fasterHashMap.mod);
@@ -367,7 +378,10 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
             int hash = newKey.fromString(key.s1, key.s2);
-//            hash=getStringHash(key.s1,key.s2);
+            if(this.hashState==0){
+                //原生哈希
+             hash=getStringHash(key.s1,key.s2);
+            }
             int timeIndex = maxMinute - firstMinute;
             for (int i = 0; i < timeIndex + 2; ++i) {
                 int timebit = i;
@@ -399,6 +413,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         prepareTime = t;
         timeIndex = maxMinute - firstMinute;
 //预热
+        System.out.println("hashstate="+this.hashState);
         System.out.println("开始预热");
         if (true) {
             final int[] heatTimes = {1499000};
@@ -505,9 +520,12 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-
-        int hashi = ffs.fromString(caller, responder);
-//        int hashi=getStringHash(caller,responder);
+        int hashi;
+        if(this.hashState==0){
+            hashi=getStringHash(caller,responder);
+        }else{
+            hashi=ffs.fromString(caller, responder);
+        }
         //time最大126来计算 是7bit
         //0是SR 1是p99
         int typebit = getTypeHash(type, time);
