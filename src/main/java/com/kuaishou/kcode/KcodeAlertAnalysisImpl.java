@@ -574,6 +574,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
+
         int hashi=ffs.fromString(caller, responder);
         //time最大126来计算 是7bit
         //0是SR 1是p99
