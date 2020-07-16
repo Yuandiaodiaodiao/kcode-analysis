@@ -206,8 +206,9 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     FastHashMap<HardHashInterface, Collection<String>[]> fastestHashMap;
     Class<?> finalClass;
     FastHashMap<HardHashInterface, Collection<String>> strAndTimeHashMap;
-    Collection<String>[]bucket;
+    Collection<String>[] bucket;
     int mod;
+
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
         System.gc();
@@ -301,70 +302,25 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
 
-        if(bestHash!=null){
-        }
+        bestHash = null;
         boolean canBestHash = false;
         if (bestHash != null) {
             canBestHash = true;
         }
-        if (canBestHash) {
-            fs.bestHash = 0;
-            fs.HN1 = bestHash[0];
-            fs.HN2 = bestHash[1];
-            fs.HN3 = bestHash[2];
-            fs.HN4 = bestHash[3];
-        }
-        //重新hash
-        boolean finalCanBestHash = canBestHash;
-//        if (finalCanBestHash) {
-//            fasterHashMap.clear();
-//            fastHashMap.forEach((key, value) -> {
-//                HashString hs = new HashString();
-//                if (finalCanBestHash) {
-//                    hs.bestHash = 0;
-//                    hs.HN1 = bestHash[0];
-//                    hs.HN2 = bestHash[1];
-//                    hs.HN3 = bestHash[2];
-//                    hs.HN4 = bestHash[3];
-//                }
-//                hs.fromString(key.s1, key.s2);
-//                fasterHashMap.put(hs, value);
-//            });
-//        }
         TimeRange doClash = new TimeRange();
         int lastMod = 0;
-//        while (fasterHashMap.getHashClash() != 0 && lastMod != fasterHashMap.mod) {
-//            fasterHashMap.clear();
-//            lastMod = fasterHashMap.mod;
-//            fasterHashMap.remodbig();
-////            System.out.println("mod="+fasterHashMap.mod);
-//            fastHashMap.forEach((key, value) -> {
-//                if (finalCanBestHash) {
-//                    HashString hs = new HashString();
-//                    hs.bestHash = 0;
-//                    hs.HN1 = bestHash[0];
-//                    hs.HN2 = bestHash[1];
-//                    hs.HN3 = bestHash[2];
-//                    hs.HN4 = bestHash[3];
-//                    hs.fromString(key.s1, key.s2);
-//                    fasterHashMap.put(hs, value);
-//                } else {
-//                    fasterHashMap.put(key, value);
-//                }
-//
-//            });
-////            System.out.println("remode"+fasterHashMap.mod);
-//        }
-
-
         doClash.point();
         doClash.output("解决哈希冲突");
-//        System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
-//        fasterHashMap.prepareReady();
+
         int mod = 20000;
         fasterHashMap = null;
-        finalClass = HashClassGenerator.generateHashCoder(bestHash,fastHashMap);
+        finalClass = HashClassGenerator.generateHashCoder(bestHash, fastHashMap);
         ffs = HashClassGenerator.getInstance();
+
+
+        //重新hash
+        boolean finalCanBestHash = canBestHash;
+
 
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
         fastestHashMap.mod = 20000;
@@ -378,8 +334,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             fastestHashMap.remodbig();
 //            System.out.println("mod="+fasterHashMap.mod);
             fastHashMap.forEach((key, value) -> {
-                int hash=ffs.fromString(key.s1,key.s2);
-                fastestHashMap.put(ffs, value,hash);
+                int hash = ffs.fromString(key.s1, key.s2);
+                fastestHashMap.put(ffs, value, hash);
 
             });
 //            System.out.println("remode"+fasterHashMap.mod);
@@ -391,76 +347,48 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 
 //        fastestHashMap.clear();
-        mod=fastestHashMap.mod;
-        this.mod=fastestHashMap.mod;
+        mod = fastestHashMap.mod;
+        this.mod = fastestHashMap.mod;
         fastestHashMap.clear();
-        fastestHashMap=null;
+        fastestHashMap = null;
 
 
-
-//        strAndTimeHashMap=new FastHashMap<>(512 * 1024 * 1024);
-//        strAndTimeHashMap.mod=mod;
-//
-//        fastHashMap.forEach((key, value) -> {
-//            HardHashInterface newKey = HashClassGenerator.getInstance();
-//            int hash=newKey.fromString(key.s1, key.s2);
-//
-//            int timeIndex = maxMinute - firstMinute;
-//            for(int i=0;i<timeIndex+2;++i){
-//                int timebit=i;
-//                //sr
-//                int typebit=2&1;
-//                int hashi=(timebit<<1)+typebit;
-//                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
-//            }
-//            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
-//                int timebit=j;
-//                //p99
-//                int typebit=3&1;
-//                int hashi=(timebit<<1)+typebit;
-//                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
-//            }
-//        });
-//        System.out.println("strAndTimeHashMap=" + strAndTimeHashMap.getHashClash() + "/" + fastHashMap.size() + "mod=" + strAndTimeHashMap.mod);
-//
-//
-//        strAndTimeHashMap.clear();
-//        strAndTimeHashMap=null;
-
-        for(int i=1;i<30;++i){
-            if(mod<(1<<i)-1){
-                mod=(1<<i)-1;
+        for (int i = 1; i < 30; ++i) {
+            if (mod < (1 << i) - 1) {
+                mod = (1 << i) - 1;
                 break;
             }
         }
 
-        bucket=new Collection[mod<<8+1];
+
+        bucket = new Collection[mod << 8 + 1];
         int finalMod = mod;
-        this.mod=finalMod;
+        this.mod = finalMod;
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
-            int hash=newKey.fromString(key.s1, key.s2);
+            int hash = newKey.fromString(key.s1, key.s2);
 //            hash=getStringHash(key.s1,key.s2);
             int timeIndex = maxMinute - firstMinute;
-            for(int i=0;i<timeIndex+2;++i){
-                int timebit=i;
+            for (int i = 0; i < timeIndex + 2; ++i) {
+                int timebit = i;
                 //sr
-                int typebit=2&1;
-                int hashi=timebit+(typebit<<7);
-                int abshash =getFinalHash(hash,hashi);
-                bucket[abshash]=value[i];
+                int typebit = 2 & 1;
+                int hashi = timebit + (typebit << 7);
+                int abshash = getFinalHash(hash, hashi);
+                bucket[abshash] = value[i];
 //                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
             }
-            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
-                int timebit=j;
+            for (int i = timeIndex + 2, j = 0; i < (timeIndex + 2) * 2; ++i, ++j) {
+                int timebit = j;
                 //p99
-                int typebit=3&1;
-                int hashi=timebit+(typebit<<7);
+                int typebit = 3 & 1;
+                int hashi = timebit + (typebit << 7);
 //                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
-                int abshash =getFinalHash(hash,hashi);
-                bucket[abshash]=value[i];
+                int abshash = getFinalHash(hash, hashi);
+                bucket[abshash] = value[i];
             }
         });
+        this.mod = mod;
         TimeRange theat = new TimeRange();
         System.gc();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -500,11 +428,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 //        Utils.getAnswer1Type(ans);
 
-        if (DistributeBufferThread.baseMinuteTime > 0) {
-            String s=AnalyzeData.printMemoryInfo();
-
-            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+mod);
-        }
+//        if (DistributeBufferThread.baseMinuteTime > 0) {
+//            String s=AnalyzeData.printMemoryInfo();
+//
+//            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+this.mod);
+//        }
         return ans;
     }
 
@@ -559,36 +487,40 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
         return t;
     }
-    public int getTypeHash(String type,String time){
-        int timebit=getTime(time);
-        int typebit=(type.length() & 1);
-        typebit=(timebit)+(typebit<<7);
+
+    public int getTypeHash(String type, String time) {
+        int timebit = getTime(time);
+        int typebit = (type.length() & 1);
+        typebit = (timebit) + (typebit << 7);
         return typebit;
     }
-    public int getFinalHash(int hash1,int hash2){
-        return ((((hash1)^(hash1>>>16))&mod)<<8)+(hash2);
+
+    public int getFinalHash(int hash1, int hash2) {
+        return ((((hash1) ^ (hash1 >>> 16)) & mod) << 8) + (hash2);
     }
-    public int getStringHash(String caller,String responder){
-        return caller.hashCode()*31+responder.hashCode();
+
+    public int getStringHash(String caller, String responder) {
+        return caller.hashCode() * 31 + responder.hashCode();
     }
+
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
 
-        int hashi=ffs.fromString(caller, responder);
+        int hashi = ffs.fromString(caller, responder);
 //        int hashi=getStringHash(caller,responder);
         //time最大126来计算 是7bit
         //0是SR 1是p99
-        int typebit=getTypeHash(type,time);
-        int index=getFinalHash(hashi,typebit);
+        int typebit = getTypeHash(type, time);
+        int index = getFinalHash(hashi, typebit);
         return bucket[index];
     }
 
     public Collection<String> getLongestPath3(String caller, String responder, String time, String type) {
-        int hashi=ffs.fromString(caller, responder);
+        int hashi = ffs.fromString(caller, responder);
         //time最大126来计算 是7bit
         //0是SR 1是p99
-        int typebit=getTypeHash(type,time);
-        return strAndTimeHashMap.get8bit(hashi,typebit);
+        int typebit = getTypeHash(type, time);
+        return strAndTimeHashMap.get8bit(hashi, typebit);
     }
 
     public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {
