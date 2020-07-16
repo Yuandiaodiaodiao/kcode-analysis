@@ -283,13 +283,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         this.mod = mod;
+        TimeRange theat = new TimeRange();
         System.gc();
 
-        System.out.println("hashstate=" + this.hashState);
-        TimeRange theat = new TimeRange();
         prepareTime = solvePrepareTime(firstMinute);
         timeIndex = maxMinute - firstMinute;
 //预热
+        System.out.println("hashstate=" + this.hashState);
         System.out.println("开始预热");
         if (true) {
             final int[] heatTimes = {1499000};
@@ -308,6 +308,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         theat.point();
         theat.output("预热耗时");
 
+
+//        Utils.getAnswer1Type(ans);
+
+//        if (DistributeBufferThread.baseMinuteTime > 0) {
+//            String s=AnalyzeData.printMemoryInfo();
+//
+//            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+this.mod);
+//        }
         return ans;
     }
 
@@ -375,9 +383,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public int solveAll(String caller, String responder, String time, String type) {
         int hashcodeA = caller.hashCode();
         char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
-        int c12=c1[12];
-        int c14=c1[14];
-        return (((((hashcodeA << 5) - hashcodeA + responder.hashCode())) & mod) << 8) + (((prepareTime + (c12<<6)-(c12<<2) + (c14<<3)+(c14<<1) + c1[15]) << 1 )+ (type.length() & 1));
+        return (((((hashcodeA << 5) - hashcodeA + responder.hashCode())) & mod) << 8) + (((prepareTime + c1[12] * 60 + c1[14] * 10 + c1[15]) << 1 )+ (type.length() & 1));
     }
 
     @Override
