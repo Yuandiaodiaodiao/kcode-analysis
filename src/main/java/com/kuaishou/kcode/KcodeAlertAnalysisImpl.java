@@ -404,7 +404,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 timeArray[2020 - y2][M] = day * 24 * 60 - 480;
             }
         }
-
     }
 
     HardHashInterface ffs;
@@ -434,7 +433,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public int getStringHash(String caller, String responder) {
-        return caller.hashCode() * 31 + responder.hashCode();
+        int hashcodeA=caller.hashCode();
+        return (hashcodeA<<5)-hashcodeA + responder.hashCode();
     }
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
