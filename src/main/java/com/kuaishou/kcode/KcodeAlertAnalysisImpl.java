@@ -208,6 +208,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     FastHashMap<HardHashInterface, Collection<String>[]> fastestHashMap;
     Class<?> finalClass;
+    FastHashMap<HardHashInterface, Collection<String>> strAndTimeHashMap;
 
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
@@ -391,6 +392,35 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         System.out.println("哈希冲突=" + fastestHashMap.getHashClash() + "/" + fastHashMap.size() + "mod=" + fastestHashMap.mod);
 
 
+//        fastestHashMap.clear();
+        mod=fastestHashMap.mod;
+        fastestHashMap.clear();
+        fastestHashMap=null;
+        strAndTimeHashMap=new FastHashMap<>(512 * 1024 * 1024);
+        strAndTimeHashMap.mod=mod;
+
+        fastHashMap.forEach((key, value) -> {
+            HardHashInterface newKey = HashClassGenerator.getInstance();
+            int hash=newKey.fromString(key.s1, key.s2);
+
+            int timeIndex = maxMinute - firstMinute;
+            for(int i=0;i<timeIndex+2;++i){
+                int timebit=i;
+                //sr
+                int typebit=2&1;
+                int hashi=(timebit<<1)+typebit;
+                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
+            }
+            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
+                int timebit=j;
+                //p99
+                int typebit=3&1;
+                int hashi=(timebit<<1)+typebit;
+                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
+            }
+        });
+        System.out.println("strAndTimeHashMap=" + strAndTimeHashMap.getHashClash() + "/" + fastHashMap.size() + "mod=" + strAndTimeHashMap.mod);
+
         TimeRange theat = new TimeRange();
         System.gc();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -426,13 +456,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t1.point();
         t1.output("read 耗时");
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-//        Utils.getAnswer1Type(ans);
 
+//        Utils.getAnswer1Type(ans);
 
 //        if (DistributeBufferThread.baseMinuteTime > 0) {
 //            String s=AnalyzeData.printMemoryInfo();
@@ -493,11 +518,19 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
         return t;
     }
-
+    public int getTypeHash(String type,String time){
+        int timebit=getTime(time);
+        int typebit=(type.length() & 1);
+        typebit=(timebit<<1)+typebit;
+        return typebit;
+    }
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
         int hashi=ffs.fromString(caller, responder);
-        return fastestHashMap.get(hashi)[(type.length() & 1) * (timeIndex + 2) + getTime(time)];
+        //time最大126来计算 是7bit
+        //0是SR 1是p99
+        int typebit=getTypeHash(type,time);
+        return strAndTimeHashMap.get8bit(hashi,typebit);
     }
 
     public Collection<String> getLongestPath2(String caller, String responder, String time, String type) {
