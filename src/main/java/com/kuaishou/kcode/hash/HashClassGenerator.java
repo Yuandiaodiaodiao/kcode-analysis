@@ -6,6 +6,8 @@ import com.kuaishou.kcode.compiler.CompilerTest;
 import com.kuaishou.kcode.compiler.User;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class HashClassGenerator {
     static long[] powArray = new long[256];
@@ -21,8 +23,9 @@ public class HashClassGenerator {
 
     }
 
-    public static Class<?> generateHashCoder(int[] args) {
+    public static Class<?> generateHashCoder(int[] args, HashMap<KcodeAlertAnalysisImpl.HashString, Collection<String>[]> fastHashMap) {
 
+        HashAnalyzer.fourArray farray=null;
 
         StringBuilder b = new StringBuilder();
         b.append("   public int fromString(String s1, String s2) {\n");
@@ -31,11 +34,13 @@ public class HashClassGenerator {
         int allIndex = 0;
 
         if (args != null) {
+            farray=HashAnalyzer.tryDeletePoint(args,fastHashMap);
             for (int i = 0; i < 4; ++i) {
                 allIndex += args[i];
             }
             allIndex-=args[4];
             allIndex-=args[5];
+            allIndex=farray.frontA.size()+farray.frontB.size()+farray.backA.size()+farray.backB.size();
         }
         if (args == null || allIndex == 0) {
             b.append(" middle = s1.length();\n" +
@@ -52,15 +57,16 @@ public class HashClassGenerator {
             b.append("   middle = c1.length;");
             b.append(" s2length = c2.length;");
             b.append("hashcodelong+=");
-            if(args[0]>0&&args[2]>0){
+            if(farray.frontA.size()>0&&farray.backA.size()>0){
                 b.append("(");
             }
-            if (args[0] > 0) {
-                int lastIndex = args[0]+args[2];
-                if(args[2]==0){
+            char c;
+            if (farray.frontA.size() > 0) {
+                int lastIndex = farray.frontA.size()+farray.backA.size();
+                if(farray.backA.size()==0){
                     b.append("(\n");
                 }
-                for (int a = args[4]; a < args[0]; ++a) {
+                for(int a:farray.frontA){
                     --allIndex;
                     int mul = intpowArray[--lastIndex];
                     if (mul != 1) {
@@ -69,16 +75,32 @@ public class HashClassGenerator {
                         b.append("c1[").append(a).append("]").append("+\n");
                     }
                 }
+//                for (int a = args[4]; a < args[0]; ++a) {
+//                    --allIndex;
+//                    int mul = intpowArray[--lastIndex];
+//                    if (mul != 1) {
+//                        b.append("c1[").append(a).append("]").append("*(").append(mul).append(")+\n");
+//                    } else {
+//                        b.append("c1[").append(a).append("]").append("+\n");
+//                    }
+//                }
                 b.setLength(b.length()-2);
-                if(args[2]==0){
+                if(farray.backA.size()==0){
                     b.append(")*(").append(powArray[allIndex]).append("L)+");
                 }else{
                     b.append("+");
                 }
             }
-            if (args[2] > 0) {
-                int lastIndex = args[2];
-                for (int a = args[2]; a > 0; --a) {
+            c=b.charAt(b.length()-1);
+            while(c=='\n'||c=='+'){
+                b.setLength(b.length()-1);
+                c=b.charAt(b.length()-1);
+            }
+            b.append("+\n");
+            if (farray.backA.size() > 0) {
+                int lastIndex =farray.backA.size();
+                for(int a:farray.backA){
+                    if(a==0)continue;
                     --allIndex;
                     int mul = intpowArray[--lastIndex];
                     if (mul != 1) {
@@ -87,16 +109,25 @@ public class HashClassGenerator {
                         b.append("c1[").append("middle-").append(a).append("]").append("+\n");
                     }
                 }
+
+                for (int a = args[2]; a > 0; --a) {
+
+                }
                 b.setLength(b.length()-2);
             }
-            if(args[0]>0&&args[2]>0){
+            if(farray.frontA.size()>0&&farray.backA.size()>0){
                 b.append(")*(").append(powArray[allIndex]).append("L)+");
             }
-
+            c=b.charAt(b.length()-1);
+            while(c=='\n'||c=='+'){
+                b.setLength(b.length()-1);
+                c=b.charAt(b.length()-1);
+            }
+            b.append("+");
             b.append("\n");
-            if (args[1] > 0) {
-                int lastIndex = args[1]+args[3];
-                for (int a = args[5]; a < args[1]; ++a) {
+            if (farray.frontB.size()> 0) {
+                int lastIndex = farray.frontB.size()+farray.backB.size();
+                for(int a:farray.frontB){
                     --allIndex;
                     int mul = intpowArray[--lastIndex];
                     if (mul != 1) {
@@ -105,10 +136,20 @@ public class HashClassGenerator {
                         b.append("c2[").append(a).append("]").append("+");
                     }
                 }
+                for (int a = args[5]; a < args[1]; ++a) {
+
+                }
             }
-            if (args[3] > 0) {
-                int lastIndex = args[3];
-                for (int a = args[3]; a > 0; --a) {
+            c=b.charAt(b.length()-1);
+            while(c=='\n'||c=='+'){
+                b.setLength(b.length()-1);
+                c=b.charAt(b.length()-1);
+            }
+            b.append("+\n");
+            if (farray.backB.size() > 0) {
+                int lastIndex = farray.backB.size();
+                for(int a:farray.backB){
+                    if(a==0)continue;
                     --allIndex;
                     int mul = intpowArray[--lastIndex];
                     if (mul != 1) {
@@ -117,10 +158,17 @@ public class HashClassGenerator {
                         b.append("c2[").append("s2length-").append(a).append("]").append("+\n");
                     }
                 }
+                for (int a = args[3]; a > 0; --a) {
+
+                }
+            }
+            c=b.charAt(b.length()-1);
+            while(c=='\n'||c=='+'){
+                b.setLength(b.length()-1);
+                c=b.charAt(b.length()-1);
             }
 
-            b.setLength(b.length()-2);
-            b.append(";");
+            b.append("\n;");
 
             b.append(" length = middle + s2length;\n" +
                     "            hashint = (int) (hashcodelong % 1000000007);");

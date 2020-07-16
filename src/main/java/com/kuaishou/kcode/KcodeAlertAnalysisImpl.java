@@ -304,6 +304,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
 
+        if(bestHash!=null){
+        }
         boolean canBestHash = false;
         if (bestHash != null) {
             canBestHash = true;
@@ -364,7 +366,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        fasterHashMap.prepareReady();
         int mod = 20000;
         fasterHashMap = null;
-        finalClass = HashClassGenerator.generateHashCoder(bestHash);
+        finalClass = HashClassGenerator.generateHashCoder(bestHash,fastHashMap);
         ffs = HashClassGenerator.getInstance();
 
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
