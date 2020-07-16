@@ -2,14 +2,13 @@ package com.kuaishou.kcode.hash;
 
 
 
-import com.kuaishou.kcode.KcodeAlertAnalysisImpl;
 import com.kuaishou.kcode.TimeRange;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.kuaishou.kcode.KcodeAlertAnalysisImpl.HashString;
+import com.kuaishou.kcode.KcodeAlertAnalysis.HashString;
 public class HashAnalyzer {
     public static int[] anslyze( HashMap<HashString, Collection<String>[]> fastHashMap){
         AtomicInteger minService1Len= new AtomicInteger(99999);
