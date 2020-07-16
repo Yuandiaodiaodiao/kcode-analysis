@@ -499,16 +499,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //        int t12 = time.charAt(12);
 //        int t14 = time.charAt(14);
         char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
-        int t = prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
-//        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
-        return t;
+        //        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
+        return prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
     }
 
     public int getTypeHash(String type, String time) {
         int timebit = getTime(time);
         int typebit = (type.length() & 1);
-        typebit = (timebit) + (typebit << 7);
-        return typebit;
+        return (timebit) + (typebit << 7);
     }
 
     public int getFinalHash(int hash1, int hash2) {
