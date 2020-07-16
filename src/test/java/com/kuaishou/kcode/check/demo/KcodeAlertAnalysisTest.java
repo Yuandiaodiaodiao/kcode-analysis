@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kuaishou.kcode.KcodeAlertAnalysis;
 import com.kuaishou.kcode.KcodeAlertAnalysisImpl;
+import com.kuaishou.kcode.KcodeAlertAnalysis;
 
 /**
  * @author KCODE
