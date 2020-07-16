@@ -109,10 +109,68 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     }
 
+    public static class FastHashString extends FashHashStringInterface {
 
+
+        static {
+            powArray = new long[256];
+            powArray[0] = 1;
+            for (int a = 1; a <= 200; ++a) {
+                powArray[a] = powArray[a - 1] * 31;
+            }
+        }
+
+        public FastHashString() {
+        }
+
+
+        public FastHashString fromByteString(ByteString bs) {
+            StringBuilder sb = new StringBuilder();
+            for (int a = bs.offset; a < bs.middle; ++a) {
+                sb.append((char) bs.value[a]);
+            }
+            s1 = sb.toString();
+            sb.setLength(0);
+            for (int a = bs.middle; a < bs.length; ++a) {
+                sb.append((char) bs.value[a]);
+            }
+            s2 = sb.toString();
+            fromString(s1, s2);
+            return this;
+        }
+
+        public long hashcodelong;
+
+        public void fromString(String s1, String s2) {
+            this.s1 = s1;
+            this.s2 = s2;
+            middle = s1.length();
+            s2length = s2.length();
+            length = middle + s2length;
+            doHash();
+        }
+
+        public void doHash() {
+            hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();
+        }
+
+        public int hashCode() {
+            return (int) (hashcodelong % 1000000007);
+        }
+
+        public boolean equals(Object obj) {
+            FastHashString fs = (FastHashString) obj;
+            return this.hashcodelong == fs.hashcodelong && this.middle == fs.middle;
+//        return this.length==fs.length && this.middle == fs.middle &&fs.s1.equals(s1) &&fs.s2.equals(s2);
+        }
+
+    }
 
     static SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
+    public KcodeAlertAnalysisImpl() {
+        manager = new DataPrepareManager();
+    }
 
     HashMap<HashString, Collection<String>[]> fastHashMap;
     FastHashMap<HashString, Collection<String>[]> fasterHashMap;
@@ -138,12 +196,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     Collection<String>[] bucket;
     int mod;
     int hashState = 0;
-    int firstMinute;
-    int maxMinute;
-
-    public KcodeAlertAnalysisImpl() {
-        manager = new DataPrepareManager();
-    }
 
     @Override
     public Collection<String> alarmMonitor(String path, Collection<String> alertRules) {
@@ -331,19 +383,26 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         stringField.setAccessible(true);
     }
 
-
+    static char[] sss;
+    ByteString bs = new ByteString(128);
+    ArrayList<String> NOANSWER = new ArrayList<>();
+    int firstMinute;
+    int maxMinute;
+    char[] ch;
     public static int timeArray[][] = new int[100][13];
 
     static {
         for (int year = 1970; year <= 2020; ++year) {
+            int y = year;
+            int y2 = year;
             for (int M = 1; M <= 12; ++M) {
-                int y3 = year;
+                int y3 = y;
                 int m2 = M;
                 m2 -= 2;
                 y3 -= m2 <= 0 ? 1 : 0;
                 m2 += m2 <= 0 ? 12 : 0;
                 int day = y3 / 4 - y3 / 100 + y3 / 400 + 367 * m2 / 12 + y3 * 365 - 719499;
-                timeArray[2020 - year][M] = day * 24 * 60 - 480;
+                timeArray[2020 - y2][M] = day * 24 * 60 - 480;
             }
         }
     }
