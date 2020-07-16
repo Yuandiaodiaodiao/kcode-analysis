@@ -501,7 +501,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
         int t = prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
 //        t = (t < 0 || t > timeIndex) ? timeIndex + 1 : t;
-        return t&0x7F;
+        return t;
     }
 
     public int getTypeHash(String type, String time) {
@@ -512,7 +512,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public int getFinalHash(int hash1, int hash2) {
-        return ((((hash1) ^ (hash1 >>> 16)) & mod) << 8) + (hash2);
+        return ((((hash1)) & mod) << 8) + (hash2);
     }
 
     public int getStringHash(String caller, String responder) {
