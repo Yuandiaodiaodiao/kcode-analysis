@@ -478,7 +478,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //预热
         System.out.println("开始预热");
         if (true) {
-            final int[] heatTimes = {1499};
+            final int[] heatTimes = {1499000};
             String timeFormat = format.format(new Date((maxMinute - firstMinute) / 2 * 60000L));
             fastHashMap.forEach((key, value) -> {
                 Collection<String> s;
