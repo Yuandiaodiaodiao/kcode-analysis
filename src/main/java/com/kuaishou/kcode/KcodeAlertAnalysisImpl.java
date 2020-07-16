@@ -429,8 +429,17 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 //
 //        strAndTimeHashMap.clear();
 //        strAndTimeHashMap=null;
+
+        for(int i=1;i<30;++i){
+            if(mod<(1<<i)-1){
+                mod=(1<<i)-1;
+                break;
+            }
+        }
+
         bucket=new Collection[mod<<8+1];
         int finalMod = mod;
+        this.mod=finalMod;
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
             int hash=newKey.fromString(key.s1, key.s2);
@@ -440,8 +449,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 int timebit=i;
                 //sr
                 int typebit=2&1;
-                int hashi=(timebit<<1)+typebit;
-                int abshash =((((hash<<1)>>>1)% finalMod)<<8)+(hashi&0xFF);
+                int hashi=timebit+(typebit<<7);
+                int abshash =getFinalHash(hash,hashi);
                 bucket[abshash]=value[i];
 //                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
             }
@@ -449,7 +458,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 int timebit=j;
                 //p99
                 int typebit=3&1;
-                int hashi=(timebit<<1)+typebit;
+                int hashi=timebit+(typebit<<7);
 //                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
                 int abshash =getFinalHash(hash,hashi);
                 bucket[abshash]=value[i];
@@ -555,11 +564,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public int getTypeHash(String type,String time){
         int timebit=getTime(time);
         int typebit=(type.length() & 1);
-        typebit=(timebit<<1)+typebit;
+        typebit=(timebit)+(typebit<<7);
         return typebit;
     }
     public int getFinalHash(int hash1,int hash2){
-        return (((hash1&0x7FFFFFFF)% mod)<<8)+(hash2);
+        return ((((hash1)^(hash1>>>16))&mod)<<8)+(hash2);
     }
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
