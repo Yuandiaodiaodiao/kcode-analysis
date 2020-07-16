@@ -267,7 +267,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
-
+        bestHash=null;
         boolean canBestHash = false;
         if (bestHash != null) {
             canBestHash = true;
@@ -472,9 +472,9 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public int getTypeHash(String type, String time) {
-        int timebit = getTime(time);
-        int typebit = (type.length() & 1);
-        return (timebit) + (typebit << 7);
+//        int timebit = getTime(time);
+//        int typebit = (type.length() & 1);
+        return (getTime(time)) + ((type.length() & 1) << 7);
     }
 
     public int getFinalHash(int hash1, int hash2) {
@@ -487,12 +487,12 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-        int hashi;
-        if(this.hashState==0){
-            hashi=getStringHash(caller,responder);
-        }else{
-            hashi=ffs.fromString(caller, responder);
-        }
+        int hashi=getStringHash(caller,responder);
+//        if(this.hashState==0){
+//            hashi
+//        }else{
+//            hashi=ffs.fromString(caller, responder);
+//        }
         //time最大126来计算 是7bit
         //0是SR 1是p99
         int typebit = getTypeHash(type, time);
