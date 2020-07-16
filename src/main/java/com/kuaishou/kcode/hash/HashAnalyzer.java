@@ -312,13 +312,24 @@ ArrayList<Integer>backup;
     }
 
     static boolean frontUnique(int start1, int start2, int minService1Len, int minService2Len, HashMap<HashString, Collection<String>[]> fastHashMap) {
-        HashSet<HashString> hashMap2 = new HashSet<>();
+        HashSet<Long> hashMap2 = new HashSet<>();
         fastHashMap.forEach((key, value) -> {
-            HashString fs1 = new HashString();
-            String news1 = key.s1.substring(start1, minService1Len);
-            String news2 = key.s2.substring(start2, minService2Len);
-            fs1.fromString(news1, news2);
-            hashMap2.add(fs1);
+            char[] c1 = (char[]) THE_UNSAFE.getObject(key.s1, 12);
+            char[] c2 = (char[]) THE_UNSAFE.getObject(key.s2, 12);
+            int c1length = c1.length;
+            int c2length = c2.length;
+            long hashA = 0;
+            for (int i=start1;i<minService1Len;++i) {
+                hashA = hashA * 31 + c1[i];
+            }
+
+            long hashB = 0;
+            for (int i=start2;i<minService2Len;++i) {
+                hashB = hashB * 31 + c1[i];
+            }
+
+            long hashc=hashA*HashString.powArray[c1length]+hashB;
+            hashMap2.add(hashc);
         });
         if (hashMap2.size() == fastHashMap.keySet().size()) {
 //            System.out.println("可以按照前半部分最小长度哈希");
