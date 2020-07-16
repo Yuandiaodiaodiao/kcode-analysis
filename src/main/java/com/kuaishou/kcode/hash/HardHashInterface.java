@@ -8,7 +8,7 @@ public interface HardHashInterface {
 
 
 
-    public static long[] powArray = new long[128];
+
 
 
 

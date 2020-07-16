@@ -43,20 +43,22 @@ public class HashClassGenerator {
             allIndex=farray.frontA.size()+farray.frontB.size()+farray.backA.size()+farray.backB.size();
         }
         if (args == null || allIndex == 0) {
-            b.append(" middle = s1.length();\n" +
-                    "            s2length = s2.length();\n" +
-                    "            length = middle + s2length;\n" +
-                    "            hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();\n" +
-                    "            hashint = (int) (hashcodelong % 1000000007);");
+            b.append(
+//                    " middle = s1.length();\n" +
+//                    "            s2length = s2.length();\n" +
+//                    "            length = middle + s2length;\n" +
+                    "          int  hashint = s1.hashCode() * 31 + s2.hashCode();\n" +
+                    "            ");
         } else {
 
             b.append(" char[] c1 = (char[]) THE_UNSAFE.getObject(s1, 12);\n" +
                     "            char[] c2 = (char[]) THE_UNSAFE.getObject(s2, 12);" +
-                    "\nhashcodelong=0;\n");
+                    "\nlong hashcodelong=0;" +
+                    "\n");
 
-            b.append("   middle = c1.length;");
-            b.append(" s2length = c2.length;");
-            b.append("hashcodelong+=");
+            b.append(" int  middle = c1.length;");
+            b.append("int s2length = c2.length;");
+            b.append(" hashcodelong =");
             if(farray.frontA.size()>0&&farray.backA.size()>0){
                 b.append("(");
             }
@@ -169,9 +171,11 @@ public class HashClassGenerator {
             }
 
             b.append("\n;");
-
-            b.append(" length = middle + s2length;\n" +
-                    "            hashint = (int) (hashcodelong % 1000000007);");
+            b.append(" int  hashint=(int)hashcodelong;");
+//            b.append(
+//                    " int length = middle + s2length;\n" +
+//                    "    int        hashint = (int) (hashcodelong % 1000000007);");
+//            b.append("int        hashint = (int) (hashcodelong % 1000000007);");
         }
         b.append("return hashint;");
         b.append(" \n }\n");
@@ -192,8 +196,8 @@ public class HashClassGenerator {
             "import java.security.PrivilegedExceptionAction;\n" +
             "\n" +
             "public final class HardHashImpl2  implements HardHashInterface{\n" +
-            "    public int length = 0;\n" +
-            "    public int middle = 0, s2length = 0;\n" +
+//            "    public int length = 0;\n" +
+//            "    public int middle = 0, s2length = 0;\n" +
 //            "    public String s1 = null, s2 = null;\n" +
             "    public long hashcodelong = 0;\n" +
             "    public int hashint = 0;\n" +
@@ -213,13 +217,6 @@ public class HashClassGenerator {
             "            throw new RuntimeException(\"Unable to load unsafe\", e);\n" +
             "        }\n" +
             "    }\n" +
-            "    static {\n" +
-            "        powArray[0] = 1;\n" +
-            "        for (int a = 1; a < 128; ++a) {\n" +
-            "            powArray[a] = powArray[a - 1] * 31;\n" +
-            "        }\n" +
-            "    }\n" +
-            "\n" +
             "    public HardHashImpl2() {\n" +
             "    }\n";
     static String sBottom = "    public int hashCode() {\n" +
@@ -309,7 +306,6 @@ public class HashClassGenerator {
         }
         return null;
     }
-
     public static HardHashInterface getInstance(String s1, String s2) {
         try {
             HardHashInterface f = (HardHashInterface) clazz.newInstance();

@@ -54,8 +54,8 @@ public class FastHashMap<K, V> {
     }
 
     public void remodbig() {
-        this.mod = nextPrime(this.mod*2);
-        this.mod = Math.min(this.capacity, this.mod);
+        this.mod = nextPrime((int)(this.mod*1.75));
+        this.mod = Math.min(this.capacity-1, this.mod);
     }
 
     static int tableSizeFor(int cap) {
@@ -149,9 +149,44 @@ public class FastHashMap<K, V> {
         return lastp.next.value;
     }
 
+    public V put(K key,V value,int hash){
+        int abshash =((hash<<1)>>>1)%mod;
+        Node<K, V> p = bucket[abshash];
+        //没有就直接放
+        if (p == null) {
+            bucket[abshash] = new Node<>(key, value);
+            return value;
+        }
+        //有的话顺着next找到一样的
+        Node<K, V> lastp = null;
+
+
+        while (p != null) {
+
+            if (p.hash != hash || !p.key.equals(key)) {
+                //如果不一样就找下一个
+                lastp = p;
+                p = p.next;
+            } else {
+                //一样了就修改
+                p.key = key;
+                p.value = value;
+                p.hash = hash;
+                return p.value;
+            }
+        }
+        //整个链表上都没有
+
+        clashNum++;
+        lastp.next = new Node<>(key, value);
+        return lastp.next.value;
+
+
+    }
+
     public V put(K key, V value) {
         int hash = key.hashCode();
-        int abshash =((hash<<1)>>>1)%mod;
+        int abshash =(((hash)^(hash>>>16))&mod);
         Node<K, V> p = bucket[abshash];
         //没有就直接放
         if (p == null) {

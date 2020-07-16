@@ -11,10 +11,7 @@ import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author KCODE
@@ -371,20 +368,18 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
         fastestHashMap.mod = 20000;
-        fastHashMap.forEach((key, value) -> {
-            HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
-            fastestHashMap.put(newKey, value);
-        });
+
         doClash = new TimeRange();
         lastMod = 0;
+        fastestHashMap.clashNum++;
         while (fastestHashMap.getHashClash() != 0 && lastMod != fastestHashMap.mod) {
             fastestHashMap.clear();
             lastMod = fastestHashMap.mod;
             fastestHashMap.remodbig();
 //            System.out.println("mod="+fasterHashMap.mod);
             fastHashMap.forEach((key, value) -> {
-                HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
-                fastestHashMap.put(newKey, value);
+                int hash=ffs.fromString(key.s1,key.s2);
+                fastestHashMap.put(ffs, value,hash);
 
             });
 //            System.out.println("remode"+fasterHashMap.mod);
@@ -445,7 +440,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
             int hash=newKey.fromString(key.s1, key.s2);
-            hash=getStringHash(key.s1,key.s2);
+//            hash=getStringHash(key.s1,key.s2);
             int timeIndex = maxMinute - firstMinute;
             for(int i=0;i<timeIndex+2;++i){
                 int timebit=i;
@@ -579,8 +574,8 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
 
-//        int hashi=ffs.fromString(caller, responder);
-        int hashi=getStringHash(caller,responder);
+        int hashi=ffs.fromString(caller, responder);
+//        int hashi=getStringHash(caller,responder);
         //time最大126来计算 是7bit
         //0是SR 1是p99
         int typebit=getTypeHash(type,time);

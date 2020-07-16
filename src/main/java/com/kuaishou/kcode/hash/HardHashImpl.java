@@ -35,12 +35,7 @@ public class HardHashImpl  implements HardHashInterface{
             throw new RuntimeException("Unable to load unsafe", e);
         }
     }
-    static {
-        powArray[0] = 1;
-        for (int a = 1; a < 128; ++a) {
-            powArray[a] = powArray[a - 1] * 31;
-        }
-    }
+
 
     public HardHashImpl() {
     }
@@ -75,7 +70,6 @@ public class HardHashImpl  implements HardHashInterface{
             middle = s1.length();
             s2length = s2.length();
             length = middle + s2length;
-            hashcodelong = s1.hashCode() * powArray[s2length] + s2.hashCode();
             hashint = (int) (hashcodelong % 1000000007);
         }
         return hashint;
