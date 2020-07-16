@@ -445,7 +445,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
             int hash=newKey.fromString(key.s1, key.s2);
-
+            hash=getStringHash(key.s1,key.s2);
             int timeIndex = maxMinute - firstMinute;
             for(int i=0;i<timeIndex+2;++i){
                 int timebit=i;
@@ -573,9 +573,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     public int getFinalHash(int hash1,int hash2){
         return ((((hash1)^(hash1>>>16))&mod)<<8)+(hash2);
     }
+    public int getStringHash(String caller,String responder){
+        return caller.hashCode()*31+responder.hashCode();
+    }
     @Override
     public Collection<String> getLongestPath(String caller, String responder, String time, String type) {
-        int hashi=ffs.fromString(caller, responder);
+
+//        int hashi=ffs.fromString(caller, responder);
+        int hashi=getStringHash(caller,responder);
         //time最大126来计算 是7bit
         //0是SR 1是p99
         int typebit=getTypeHash(type,time);
