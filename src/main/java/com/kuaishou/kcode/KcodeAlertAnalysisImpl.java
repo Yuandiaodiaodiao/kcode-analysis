@@ -474,6 +474,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         prepareTime = t;
         timeIndex = maxMinute - firstMinute;
 //预热
+        System.out.println("开始预热");
         if (true) {
             final int[] heatTimes = {1499};
             String timeFormat = format.format(new Date((maxMinute - firstMinute) / 2 * 60000L));
