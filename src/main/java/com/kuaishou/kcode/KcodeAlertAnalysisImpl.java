@@ -222,32 +222,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t1.point();
         firstMinute = manager.mergeThread.firstMinute;
 
-//        try {
-//            Thread.sleep(1000*70);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        boolean dr=manager.diskRead.isAlive();
-//        boolean db=manager.distributeBuffer.isAlive();
-//        boolean mr=manager.mergeThread.isAlive();
-//
-//        int rbAlive=0;
-//        for (int i = 0; i < DataPrepareManager.THREAD_NUMBER; ++i) {
-//            if(DataPrepareManager.rawBufferSolveThreadArray[i].isAlive()){
-//                rbAlive++;
-//            }
-//        }
-//        String sx="DR"+(dr?1:0)+"DB"+(db?1:0)+"MR"+(mr?1:0)+"rb"+rbAlive;
-//        ArrayList<BufferWithLatch> bl=manager.distributeBuffer.latchArray;
-//        for(BufferWithLatch b:bl){
-//            if(b.countdown.getCount()>0){
-//                sx+="m"+(b.minute-firstMinute)+"id"+(b.id);
-//                break;
-//            }
-//        }
-//        if (DistributeBufferThread.baseMinuteTime > 0) {
-//            throw new IndexOutOfBoundsException(sx);
-//        }
         manager.prepareQ2();
 
         t2.point();
@@ -279,15 +253,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             }
-//            long offset=THE_UNSAFE.objectFieldOffset(f);
-//            long offset2=THE_UNSAFE.arrayBaseOffset(char[].class);
-//            String aaa=newkey2.s1;
-//            char[] c=(char[])THE_UNSAFE.getObject(aaa,12);
-//            int a=THE_UNSAFE.getInt(c,offset2);
-//            char ccc=THE_UNSAFE.getChar(c,offset2);
-//            char cccd=THE_UNSAFE.getChar(c,offset2);
-//            byte cc=THE_UNSAFE.getByte(c,offset2);
-//            int b=THE_UNSAFE.getInt(c,offset2+4);
+
 
             Collection<String>[] ansArray = new ArrayList[(timeIndex + 2) * 2];
             fastHashMap.put(newkey2, ansArray);
@@ -329,7 +295,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
-        fastestHashMap.mod = 20000;
+        fastestHashMap.mod = 4096-1;
 
         doClash = new TimeRange();
         lastMod = 0;
@@ -342,9 +308,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             fastHashMap.forEach((key, value) -> {
                 if(this.hashState==0){
                     int hash = getStringHash(key.s1, key.s2);
+                    hash=hash&fastestHashMap.mod;
                     fastestHashMap.put(ffs, value, hash);
                 }else{
                     int hash = ffs.fromString(key.s1, key.s2);
+                    hash=hash&fastestHashMap.mod;
                     fastestHashMap.put(ffs, value, hash);
                 }
 

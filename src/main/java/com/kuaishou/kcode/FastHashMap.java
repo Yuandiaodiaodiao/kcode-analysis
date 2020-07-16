@@ -54,7 +54,7 @@ public class FastHashMap<K, V> {
     }
 
     public void remodbig() {
-        this.mod = nextPrime((int)(this.mod*1.75));
+        this.mod = (int)(this.mod<<1)+1;
         this.mod = Math.min(this.capacity-1, this.mod);
     }
 
@@ -150,7 +150,7 @@ public class FastHashMap<K, V> {
     }
 
     public V put(K key,V value,int hash){
-        int abshash =((hash<<1)>>>1)%mod;
+        int abshash =hash;
         Node<K, V> p = bucket[abshash];
         //没有就直接放
         if (p == null) {
