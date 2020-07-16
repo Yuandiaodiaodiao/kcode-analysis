@@ -51,23 +51,24 @@ public class DataPrepareManager {
         AlertRulesPrepare.RuleMaps rm = AlertRulesPrepare.prepare3HashMap(ruleArray);
         //rules处理好之后在merge每分钟之后进行报警处理
         mergeThread.setRuleMaps(rm);
-//        mergeThread.start();
+        mergeThread.start();
     }
 
     public void stop() {
         try {
             diskRead.join();
             distributeBuffer.join();
-            for (int i = 0; i < THREAD_NUMBER; ++i) {
-                rawBufferSolveThreadArray[i].join();
-//                System.out.println("thread"+i+"join");
-            }
+            mergeThread.join();
+//            for (int i = 0; i < THREAD_NUMBER; ++i) {
+//                rawBufferSolveThreadArray[i].join();
+////                System.out.println("thread"+i+"join");
+//            }
             unsolvedBuffer.clear();
             solvedBuffer.clear();
             DistributeBufferThread.lastBufferNumbers=THREAD_NUMBER+1;
 //            System.gc();
             TimeRange tz=new TimeRange();
-            mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
+//            mergeThread.handleMerge(distributeBuffer.lastMinuteTime+2+6);
             for(int i=0;i<THREAD_NUMBER;++i){
                 rawBufferSolveThreadArray[i].timeNameIpStore=null;
             }

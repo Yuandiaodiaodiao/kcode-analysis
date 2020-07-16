@@ -45,7 +45,7 @@ public class RawBufferSolveThread extends Thread {
                 }
                 solveLine(buffer);
                 //处理完之后 触发处理ok
-//                countdown.countDown();
+                countdown.countDown();
                 if (buffer.get(buffer.limit() - 1) == '\n') {
 //                        System.out.println("正常");
                 } else {
