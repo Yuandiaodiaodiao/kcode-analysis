@@ -317,7 +317,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 int timebit = i;
                 //sr
                 int typebit = 2 & 1;
-                int hashi = timebit + (typebit << 7);
+                int hashi = typebit + (timebit << 1);
                 int abshash = getFinalHash(hash, hashi);
                 bucket[abshash] = value[i];
 //                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
@@ -326,7 +326,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
                 int timebit = j;
                 //p99
                 int typebit = 3 & 1;
-                int hashi = timebit + (typebit << 7);
+                int hashi = typebit + (timebit << 1);
 //                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
                 int abshash = getFinalHash(hash, hashi);
                 bucket[abshash] = value[i];
@@ -425,7 +425,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     }
 
     public int getTypeHash(String type, String time) {
-        return (getTime(time)) + ((type.length() & 1) << 7);
+        return (getTime(time)<<1) + ((type.length() & 1));
     }
 
     public int getFinalHash(int hash1, int hash2) {
