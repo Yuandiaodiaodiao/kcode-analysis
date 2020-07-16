@@ -259,11 +259,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         Q2Answer = manager.Q2Answer;
 
         fastHashMap = new HashMap<>(4096 * 1024);
-        AnalyzeData.printMemoryInfo();
-
-        fasterHashMap = new FastHashMap<>(20000);
-        AnalyzeData.printMemoryInfo();
-        fasterHashMap.mod = 10000;
+//        AnalyzeData.printMemoryInfo();
+//
+//        fasterHashMap = new FastHashMap<>(20000);
+//        AnalyzeData.printMemoryInfo();
+//        fasterHashMap.mod = 20000;
 //        HashClassGenerator.test();
         fs = new HashString();
         Q2Answer.forEach((key, value) -> {
@@ -360,15 +360,15 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
         doClash.point();
         doClash.output("解决哈希冲突");
-        System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
-        fasterHashMap.prepareReady();
-        int mod = fasterHashMap.mod;
+//        System.out.println("哈希冲突=" + fasterHashMap.getHashClash() + "/" + fastHashMap.size());
+//        fasterHashMap.prepareReady();
+        int mod = 20000;
         fasterHashMap = null;
         finalClass = HashClassGenerator.generateHashCoder(bestHash);
         ffs = HashClassGenerator.getInstance();
 
         fastestHashMap = new FastHashMap<>(64 * 1024 * 1024);
-        fastestHashMap.mod = mod;
+        fastestHashMap.mod = 20000;
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance(key.s1, key.s2);
             fastestHashMap.put(newKey, value);
@@ -401,35 +401,35 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 
 
-        strAndTimeHashMap=new FastHashMap<>(512 * 1024 * 1024);
-        strAndTimeHashMap.mod=mod;
-
-        fastHashMap.forEach((key, value) -> {
-            HardHashInterface newKey = HashClassGenerator.getInstance();
-            int hash=newKey.fromString(key.s1, key.s2);
-
-            int timeIndex = maxMinute - firstMinute;
-            for(int i=0;i<timeIndex+2;++i){
-                int timebit=i;
-                //sr
-                int typebit=2&1;
-                int hashi=(timebit<<1)+typebit;
-                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
-            }
-            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
-                int timebit=j;
-                //p99
-                int typebit=3&1;
-                int hashi=(timebit<<1)+typebit;
-                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
-            }
-        });
-        System.out.println("strAndTimeHashMap=" + strAndTimeHashMap.getHashClash() + "/" + fastHashMap.size() + "mod=" + strAndTimeHashMap.mod);
-
-
-        strAndTimeHashMap.clear();
-        strAndTimeHashMap=null;
-        bucket=new Collection[512 * 1024 * 1024];
+//        strAndTimeHashMap=new FastHashMap<>(512 * 1024 * 1024);
+//        strAndTimeHashMap.mod=mod;
+//
+//        fastHashMap.forEach((key, value) -> {
+//            HardHashInterface newKey = HashClassGenerator.getInstance();
+//            int hash=newKey.fromString(key.s1, key.s2);
+//
+//            int timeIndex = maxMinute - firstMinute;
+//            for(int i=0;i<timeIndex+2;++i){
+//                int timebit=i;
+//                //sr
+//                int typebit=2&1;
+//                int hashi=(timebit<<1)+typebit;
+//                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
+//            }
+//            for(int i=timeIndex+2,j=0;i<(timeIndex+2)*2;++i,++j){
+//                int timebit=j;
+//                //p99
+//                int typebit=3&1;
+//                int hashi=(timebit<<1)+typebit;
+//                strAndTimeHashMap.put8bit(newKey, value[i],hash,hashi);
+//            }
+//        });
+//        System.out.println("strAndTimeHashMap=" + strAndTimeHashMap.getHashClash() + "/" + fastHashMap.size() + "mod=" + strAndTimeHashMap.mod);
+//
+//
+//        strAndTimeHashMap.clear();
+//        strAndTimeHashMap=null;
+        bucket=new Collection[mod<<8+1];
         int finalMod = mod;
         fastHashMap.forEach((key, value) -> {
             HardHashInterface newKey = HashClassGenerator.getInstance();
@@ -493,11 +493,11 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
 //        Utils.getAnswer1Type(ans);
 
-//        if (DistributeBufferThread.baseMinuteTime > 0) {
-//            String s=AnalyzeData.printMemoryInfo();
-//
-//            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+fastestHashMap.mod);
-//        }
+        if (DistributeBufferThread.baseMinuteTime > 0) {
+            String s=AnalyzeData.printMemoryInfo();
+
+            throw new ArrayIndexOutOfBoundsException("RAM" + s + "耗时" + t1.firstTime() + "R=" + alertRules.size() + "K=" + manager.getServicePairNum() + "A=" + ans.size()+"M="+mod);
+        }
         return ans;
     }
 
