@@ -415,13 +415,13 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         String starttimeFormat = format.format(new Date(firstMinute * 60000L));
         int y = 55348 - starttimeFormat.charAt(0) * 1000 - starttimeFormat.charAt(1) * 100 - starttimeFormat.charAt(2) * 10 - starttimeFormat.charAt(3);
         int M = starttimeFormat.charAt(5) * 10 + starttimeFormat.charAt(6) - 528;
-        int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528+starttimeFormat.charAt(11)*600 - firstMinute;
+        int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528 - firstMinute;
         return t;
     }
 
     public int getTime(String time) {
         char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
-        return prepareTime + c1[12] * 60 + c1[14] * 10 + c1[15];
+        return prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
     }
 
     public int getTypeHash(String type, String time) {
