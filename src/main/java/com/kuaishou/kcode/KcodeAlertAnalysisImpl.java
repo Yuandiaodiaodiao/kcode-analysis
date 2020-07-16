@@ -168,20 +168,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     static SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public KcodeAlertAnalysisImpl() {
-
-        try {
-            Field f = String.class.getDeclaredField("value");
-            long offset = THE_UNSAFE.objectFieldOffset(f);
-            String aaa = "12345678";
-            int a = THE_UNSAFE.getInt(aaa, offset);
-            char ccc = THE_UNSAFE.getChar(aaa, offset);
-            char cccd = THE_UNSAFE.getChar(aaa, offset + 1);
-            byte cc = THE_UNSAFE.getByte(aaa, offset);
-            int b = THE_UNSAFE.getInt(aaa, offset + 4);
-            int c = 1;
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
         manager = new DataPrepareManager();
     }
 
@@ -206,7 +192,6 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
 
     FastHashMap<HardHashInterface, Collection<String>[]> fastestHashMap;
     Class<?> finalClass;
-    FastHashMap<HardHashInterface, Collection<String>> strAndTimeHashMap;
     Collection<String>[] bucket;
     int mod;
     int hashState=0;
@@ -228,33 +213,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         t2.point();
 
         fastHashMap = new HashMap<>(4096 * 1024);
-//        AnalyzeData.printMemoryInfo();
-//
-//        fasterHashMap = new FastHashMap<>(20000);
-//        AnalyzeData.printMemoryInfo();
-//        fasterHashMap.mod = 20000;
-//        HashClassGenerator.test();
+
         Q2Answer.forEach((key, value) -> {
-//            FastHashString newkey = new FastHashString();
-//            newkey.fromByteString(key);
-//            FashHashStringInterface newkey2 = HashClassGenerator.getInstance(key);
             HashString newkey2 = new HashString();
             newkey2.fromByteString(key);
             int timeIndex = maxMinute - firstMinute;
 
-
-            Field f = null;
-            try {
-                f = String.class.getDeclaredField("value");
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            }
-
-
             Collection<String>[] ansArray = new ArrayList[(timeIndex + 2) * 2];
             fastHashMap.put(newkey2, ansArray);
-
-//            fasterHashMap.put(newkey2, ansArray);
             for (int i = 0; i < timeIndex + 2; ++i) {
                 ansArray[i] = value.SRArray[i];
             }
