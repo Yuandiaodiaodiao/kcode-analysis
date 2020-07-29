@@ -31,6 +31,7 @@ public class HardHashImpl  implements HardHashInterface{
                 }
             };
             THE_UNSAFE = AccessController.doPrivileged(action);
+
         } catch (Exception e) {
             throw new RuntimeException("Unable to load unsafe", e);
         }

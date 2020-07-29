@@ -13,7 +13,7 @@ public class DataPrepareManager {
     DistributeBufferThread distributeBuffer;
     HashMapMergeThread mergeThread;
     static RawBufferSolveThread[] rawBufferSolveThreadArray = new RawBufferSolveThread[16];
-    static int THREAD_NUMBER = 4;
+    static int THREAD_NUMBER = 6;
     static ArrayBlockingQueue<ByteBuffer> canuse = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<ByteBuffer> canread = new ArrayBlockingQueue<ByteBuffer>(64);
     static ArrayBlockingQueue<BufferWithLatch> unsolvedBuffer = new ArrayBlockingQueue<>(64);

@@ -31,7 +31,7 @@ public class HashAnalyzer {
             this.backB=backB;
         }
     }
-    static int THREHOLD =10;
+    static int THREHOLD =0;
 
     public static fourArray tryDeletePoint(int[] args, HashMap<HashString, Collection<String>[]> fastHashMap) {
 ArrayList<Integer>backup;

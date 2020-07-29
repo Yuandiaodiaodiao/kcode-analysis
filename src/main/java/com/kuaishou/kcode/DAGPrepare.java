@@ -151,7 +151,6 @@ public class DAGPrepare {
     void topsort() {
         ArrayList<Vertex> ans = new ArrayList<>();
         Stack<Vertex> stack = new Stack<>();
-        int len = vertexArray.size();
         for (Vertex v : vertexArray) {
             if (v.inDegree == 0) {
                 stack.add(v);
@@ -389,7 +388,6 @@ public class DAGPrepare {
             answerList.add(new ByteStringAndVertex(fsb.toByteString(), (ArrayList<Integer>) vertexArrayList.clone()));
             vertexArrayList.remove(vertexArrayList.size() - 1);
             fsb.setLength(index);
-//            answerList.add(new ByteString());
         } else {
             int index = fsb.index;
             fsb.append(p.v.bs);

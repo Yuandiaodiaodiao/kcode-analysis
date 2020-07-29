@@ -5,6 +5,7 @@ import com.kuaishou.kcode.hash.*;
 import jdk.nashorn.internal.objects.NativeInt8Array;
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -229,7 +230,7 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
             }
         });
         int[] bestHash = HashAnalyzer.anslyze(fastHashMap);
-        bestHash=null;
+//        bestHash=null;
         boolean canBestHash = false;
         if (bestHash != null) {
             canBestHash = true;
@@ -388,20 +389,18 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
     int firstMinute;
     int maxMinute;
     char[] ch;
-    public static int timeArray[][] = new int[100][13];
 
+    public static int timeArray[][] = new int[100][13];
     static {
         for (int year = 1970; year <= 2020; ++year) {
-            int y = year;
-            int y2 = year;
             for (int M = 1; M <= 12; ++M) {
-                int y3 = y;
+                int y3 = year;
                 int m2 = M;
                 m2 -= 2;
                 y3 -= m2 <= 0 ? 1 : 0;
                 m2 += m2 <= 0 ? 12 : 0;
                 int day = y3 / 4 - y3 / 100 + y3 / 400 + 367 * m2 / 12 + y3 * 365 - 719499;
-                timeArray[2020 - y2][M] = day * 24 * 60 - 480;
+                timeArray[2020 - year][M] = day * 24 * 60 - 480;
             }
         }
     }
@@ -418,7 +417,14 @@ public class KcodeAlertAnalysisImpl implements KcodeAlertAnalysis {
         int t = timeArray[y][M] + starttimeFormat.charAt(8) * 14400 + starttimeFormat.charAt(9) * 1440 - 792528 - firstMinute;
         return t;
     }
-
+    public int getTime2(String time){
+        char[] c = (char[]) THE_UNSAFE.getObject(time, 12);
+        int year = 55348 - c[0] * 1000 - c[1] * 100 - c[2] * 10 - c[3];
+        int month = c[5] * 10 + c[6] - 528;
+        int t = timeArray[year][month] + c[8] * 14400 + c[9] * 1440+
+                c[11] * 600 + c[12] * 60 + c[14] * 10 + c[15] - 792528 - firstMinute;
+        return t;
+    }
     public int getTime(String time) {
         char[] c1 = (char[]) THE_UNSAFE.getObject(time, 12);
         return prepareTime + c1[11] * 600 + c1[12] * 60 + c1[14] * 10 + c1[15];
